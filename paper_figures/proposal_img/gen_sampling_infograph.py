@@ -35,8 +35,8 @@ for ax in axs.flat:
 
 plt.tight_layout()
 plt.legend()
-plt.xlabel('Number of samples')
-plt.ylabel('Number of iterations')
+plt.xlabel('i')
+plt.ylabel('x')
 plt.suptitle('Infograph')
 plt.savefig('infograph.png')
 
