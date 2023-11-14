@@ -4,12 +4,9 @@ from math import log2, floor
 
 n=np.array([1e3, 1e4, 1e5, 1e6, 1e7,1e8], dtype=int)
 i=[np.linspace(1,floor(log2(ni)),floor(log2(ni))) for ni in n]
-for row in i:
-    print(np.shape(row))   
 x=[]
 for idx,row in enumerate(i):
     x.append(np.divide(n[idx],row))
-    print(np.shape(x[idx]))
 
 fig, axs = plt.subplots(3, 2, figsize=(10, 10))
 
@@ -27,7 +24,7 @@ axs[2, 1].plot(i[5],x[5],label='n=1e8')
 axs[2, 1].set_title('n=1e8')
 
 for ax in axs.flat:
-    ax.set(xlabel='Number of samples', ylabel='Number of iterations')
+    ax.set(xlabel='i', ylabel='x')
 
 # Hide x labels and tick labels for top plots and y ticks for right plots.
 for ax in axs.flat:
@@ -35,8 +32,6 @@ for ax in axs.flat:
 
 plt.tight_layout()
 plt.legend()
-plt.xlabel('i')
-plt.ylabel('x')
 plt.suptitle('Infograph')
 plt.savefig('infograph.png')
 
