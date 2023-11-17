@@ -36,7 +36,7 @@ plt.suptitle('Infograph')
 plt.savefig('infograph.png')
 
 
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+fig, axs = plt.subplots(1, 2, figsize=(15, 4))
 
 axs[0].plot(i[0],x[0],label='n=1e3')
 axs[0].set_title('Iteration 1')
