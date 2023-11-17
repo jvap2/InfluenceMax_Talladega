@@ -11,7 +11,11 @@ def theta_1(n,k,l,OPT,epsilon):
 def theta_2(n,k,l,OPT,epsilon, epsilon_1):
     # if epsilon_1<epsilon:
     #     raise ValueError("$epsilon_1$ must be greater than epsilon")
-    return (2+2*exp(-1))*n*np.log(comb(n,k)/(2*n**l))/(OPT*(epsilon-(1-exp(-1))*epsilon_1)**2)
+    const=(2-2*exp(-1))*n
+    log_val=np.log(comb(n,k))+l*np.log(n)+log(2)
+    denom=OPT*(epsilon-(1-exp(-1))*epsilon_1)**2
+    return const*log_val/denom
+
 
 def theta(n,a,B,OPT,epsilon):
     return 2*n*((1-exp(-1))*a+B)**2/(OPT*epsilon**2)
