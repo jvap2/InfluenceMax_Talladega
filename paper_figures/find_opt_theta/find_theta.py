@@ -13,6 +13,9 @@ def theta_2(n,k,l,OPT,epsilon, epsilon_1):
     #     raise ValueError("$epsilon_1$ must be greater than epsilon")
     return (2+2*exp(-1))*n*np.log(comb(n,k)/(2*n**l))/(OPT*(epsilon-(1-exp(-1))*epsilon_1)**2)
 
+def theta(n,a,B,OPT,epsilon):
+    return 2*n*((1-exp(-1))*a+B)**2/(OPT*epsilon**2)
+
 n=np.array([10,1e2,1e3])
 k=np.array([1,5,50])
 l=1
@@ -34,6 +37,7 @@ print(b)
 
 theta1=theta_1(n,k,l,OPT,epsilon_1)
 theta2=theta_2(n,k,l,OPT,epsilon,epsilon_1)
+theta=theta(n,a,b,OPT,epsilon)
 
 if np.isnan(epsilon).any() or np.isnan(epsilon_1).any() or np.isnan(theta1).any():
     print("NaN values found")
@@ -72,7 +76,7 @@ plt.show()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_trisurf(epsilon, n, theta2, cmap='viridis')
+ax.plot_trisurf(epsilon_1, n, theta2, cmap='viridis')
 ax.set_xlabel(r'$\epsilon_{1}$')
 ax.set_ylabel('n')
 ax.set_ylim(10,1e3)
@@ -81,6 +85,19 @@ ax.text2D(0.0, 1, fr"k={k}", transform=ax.transAxes)
 ax.text2D(0.00, 0.95, fr"$\epsilon_1$={epsilon_1}", transform=ax.transAxes)
 plt.savefig("theta2_ep1.pdf")
 plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_trisurf(epsilon, n, theta, cmap='viridis')
+ax.set_xlabel(r'$\epsilon$')
+ax.set_ylabel('n')
+ax.set_ylim(10,1e3)
+ax.set_zlabel(r"$\theta$")
+ax.text2D(0.0, 1, fr"k={k}", transform=ax.transAxes)
+ax.text2D(0.00, 0.95, fr"$\epsilon$={epsilon}", transform=ax.transAxes)
+plt.savefig("theta.pdf")
+plt.show()
+
 
 
 
