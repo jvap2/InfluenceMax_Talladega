@@ -36,3 +36,18 @@ plt.suptitle('Infograph')
 plt.savefig('infograph.png')
 
 
+fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+
+axs[0].plot(i[0],x[0],label='n=1e3')
+axs[0].set_title('Iteration 1')
+axs[0].annotate(r'$x_0$',xy=(i[0][0],x[0][0]),xytext=(i[0][0]+2,x[0][0]+1),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[0].annotate(r'$x_{\log_{2}(n)-1}$',xy=(i[0][-1],x[0][-1]),xytext=(i[0][-1]+.5,x[0][-1]+5),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[0].annotate(r'$x_{(\log_{2}(n)-1)/2}$',xy=(i[0][int(len(i)/2)],x[0][int(len(i)/2)]),xytext=(i[0][int(len(i)/2)]+2,x[0][int(len(i)/2)]+5),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[1].plot(i[0],x[0],label='n=1e3')
+axs[1].set_title('Iteration 2')
+axs[1].annotate(r'$x_0, DNC$',xy=(i[0][0],x[0][0]),xytext=(i[0][0]+2,x[0][0]+1),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[1].annotate(r'$x_{\log_{2}(n)-1}, C$',xy=(i[0][-1],x[0][-1]),xytext=(i[0][-1]+.5,x[0][-1]+5),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[1].annotate(r'$x_{(\log_{2}(n)-1)/2}$,C',xy=(i[0][int(len(i)/2)],x[0][int(len(i)/2)]),xytext=(i[0][int(len(i)/2)]+2,x[0][int(len(i)/2)]+5),arrowprops=dict(facecolor='black', shrink=0.05))
+axs[1].annotate(r'$x_{(\log_{2}(n)-1)/4}$',xy=(i[0][int(len(i)/4)],x[0][int(len(i)/4)]),xytext=(i[0][int(len(i)/4)]+1,x[0][int(len(i)/4)]+5),arrowprops=dict(facecolor='black', shrink=0.05))
+
+plt.savefig('infograph_2.png')
