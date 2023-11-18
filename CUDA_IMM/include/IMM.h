@@ -25,5 +25,26 @@ using namespace std;
 #include <thrust/sequence.h>
 #include <thrust/sort.h>
 
+#define TPB 256
+
 
 #include "../include/GPUErrors.h"
+
+typedef struct{
+    unsigned int src;
+    unsigned int dst;
+    float weight;
+}edge_t_IC;
+
+typedef struct{
+    unsigned int num;
+    float prob;
+}node_t_LT;
+
+typedef struct{
+    node_t_LT src;
+    node_t_LT dst;
+}edge_t_LT;
+
+//CUDA Code 
+__global__ void NodeSel_V1(unsigned int* hist_bin, unsigned int* RR_nodes, unsigned int size);
