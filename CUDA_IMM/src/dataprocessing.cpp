@@ -73,26 +73,26 @@ void get_graph_info(string path, unsigned int* nodes, unsigned int* edges){
 
 }
 
-void genCSC_LT(edge_t_LT* edge_list, node_t_LT* succ, unsigned int* csc, unsigned int size){
-    unsigned int* csc_temp = new unsigned int[size]{0};
-    for(unsigned int i = 0; i < size; i++){
+void genCSC_LT(edge_t_LT* edge_list, node_t_LT* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
+    unsigned int* csc_temp = new unsigned int[node_size+1]{0};
+    for(unsigned int i = 0; i < edge_size; i++){
         csc_temp[edge_list[i].dst.num]++;
         succ[i] = edge_list[i].src;
     }
     csc[0] = 0;
-    for(unsigned int i = 1; i<size; i++){
+    for(unsigned int i = 1; i<=node_size; i++){
         csc[i] = csc[i-1] + csc_temp[i-1];
     }
 }
 
-void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsigned int size){
-    unsigned int* csc_temp = new unsigned int[size]{0};
-    for(unsigned int i = 0; i < size; i++){
+void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
+    unsigned int* csc_temp = new unsigned int[node_size+1]{0};
+    for(unsigned int i = 0; i < edge_size; i++){
         csc_temp[edge_list[i].dst]++;
         succ[i] = edge_list[i].src;
     }
     csc[0] = 0;
-    for(unsigned int i = 1; i<size; i++){
+    for(unsigned int i = 1; i<=node_size; i++){
         csc[i] = csc[i-1] + csc_temp[i-1];
     }
 }

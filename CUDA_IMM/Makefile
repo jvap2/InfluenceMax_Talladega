@@ -22,7 +22,7 @@ $(BIN)/IMM: $(OBJ)/main.o $(OBJ)/nodesel.o $(OBJ)/data.o $(OBJ)/sampling.o
 $(OBJ)/nodesel.o: $(SRC)/nodeselection.cu
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-$(OBJ)/data.o: $(SRC)/dataprocessing.cu
+$(OBJ)/data.o: $(SRC)/dataprocessing.cpp
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/main.o: $(SRC)/main.cpp
