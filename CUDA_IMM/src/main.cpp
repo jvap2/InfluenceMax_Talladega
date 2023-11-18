@@ -1,5 +1,4 @@
 #include "../include/IMM.h"
-#include "../include/data.h"
 
 #include <string.h>
 
