@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.bison": "bison",
+        "iosfwd": "cpp"
+    }
+}

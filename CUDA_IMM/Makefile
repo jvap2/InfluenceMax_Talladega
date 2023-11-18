@@ -28,7 +28,7 @@ $(OBJ)/data.o: $(SRC)/dataprocessing.cpp
 $(OBJ)/main.o: $(SRC)/main.cpp
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-$(OBJ)/sampling.o: $(SRC)/sampling.cu
+$(OBJ)/sampling.o: $(SRC)/sampling.cu 
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 
