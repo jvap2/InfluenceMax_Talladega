@@ -32,3 +32,30 @@ but would it be convenient to traverse both ways with a COO format?
 2) We may be able to use linked lists as well but this will be slower, but also harder to implement, and harder for generating RRR sets
 
 */
+
+
+__host__ void IMM_Ver1(unsigned int* csc, unsigned int* succ, float epsilon, float l, unsigned int n, unsigned int m){
+    //Step 1
+    //Step 2
+    float epsilon_prime = sqrt(2)*epsilon;
+    //Step 3
+    int num_iterations =(int)(log2(n)-1);
+    unsigned int i = 1;
+    unsigned int x = n/2;
+    float lambda_prime=(2+(2.0f/3.0f)*epsilon_prime)*(Calc_LogComb(n,K)+l*logf(n)+logf(log2f(n)))*n/(powf(epsilon_prime,2));
+    float alpha = sqrtf(l*logf(n)+logf(2));
+    float beta = sqrtf((1-1/expf(1))*(Calc_LogComb(n,K)+l*logf(n)+logf(2)));
+    float lambda_star = 2*n*(powf((1-expf(-1))*(alpha+beta),2.0f)/(epsilon*epsilon));
+    float theta = epsilon_prime/x;
+    //Step 4
+}
+
+__host__ float Calc_LogComb(unsigned int n, unsigned int k){
+    float temp_1=0;
+    float temp_2=0;
+    for(unsigned int i = 0; i<n-k;i++){
+        temp_1+=logf(k+i+1);
+        temp_2+=logf(i+1);
+    }
+    return temp_1-temp_2;
+}

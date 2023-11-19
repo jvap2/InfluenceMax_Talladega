@@ -12,6 +12,7 @@ The psuedocode for the node selection is as follows
 
 
 //This is likely an unoptimized version , but will take in a set of nodes in an RRR set, and returns a count
+//This version would be used with streams or for a merged set of nodes
 __global__ void NodeSel_V1(unsigned int* hist_bin, unsigned int* RR_nodes, unsigned int size){
     unsigned int idx = blockIdx.x*blockDim.x + threadIdx.x;
     //Get the thread coordinates

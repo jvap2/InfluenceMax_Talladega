@@ -6,6 +6,7 @@
 #include<algorithm>
 #include<cstdlib>
 #include<ctime>
+#include <cmath>
 using namespace std;
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -26,6 +27,7 @@ using namespace std;
 #include <thrust/sort.h>
 
 #define TPB 256
+#define K 50
 
 
 #include "../include/GPUErrors.h"
@@ -48,3 +50,8 @@ typedef struct{
 
 //CUDA Code 
 __global__ void NodeSel_V1(unsigned int* hist_bin, unsigned int* RR_nodes, unsigned int size);
+__host__ void IMM_Ver1(unsigned int* csc, unsigned int* succ, float epsilon, float l, unsigned int n, unsigned int m);
+
+
+//host code
+__host__ float Calc_LogComb(unsigned int n, unsigned int k);
