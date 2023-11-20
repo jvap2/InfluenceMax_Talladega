@@ -96,3 +96,15 @@ void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsi
         csc[i] = csc[i-1] + csc_temp[i-1];
     }
 }
+
+void genCSC_IC_bit(edge_t_IC* edge_list, unsigned char* bit_f,unsigned int edge_size, unsigned int bitmap_size){
+    for(unsigned int i=0; i<edge_size; i++){
+        unsigned int row_idx = edge_list[i].src/8;
+        unsigned int row_offset = edge_list[i].src%8;
+        unsigned int col_idx = edge_list[i].dst/8;
+        unsigned int col_offset = col_idx%8;
+        bit_f[row_idx*bitmap_size+col_idx] |= (1<<col_offset);
+
+
+    }
+}

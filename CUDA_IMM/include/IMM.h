@@ -25,9 +25,10 @@ using namespace std;
 #include <thrust/functional.h>
 #include <thrust/sequence.h>
 #include <thrust/sort.h>
+#include "GPUErrors.h"
 
 #define TPB 256
-#define K 50
+#define K 10
 
 
 #include "../include/GPUErrors.h"
@@ -50,8 +51,9 @@ typedef struct{
 
 //CUDA Code 
 __global__ void NodeSel_V1(unsigned int* hist_bin, unsigned int* RR_nodes, unsigned int size);
-__host__ void IMM_Ver1(unsigned int* csc, unsigned int* succ, float epsilon, float l, unsigned int n, unsigned int m);
+__host__ void IMM_Ver1();
 
 
 //host code
 __host__ float Calc_LogComb(unsigned int n, unsigned int k);
+

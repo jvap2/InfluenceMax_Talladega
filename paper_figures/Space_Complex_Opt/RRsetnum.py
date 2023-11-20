@@ -37,6 +37,11 @@ ax.set_xlabel(r'$\epsilon$')
 ax.set_ylabel(r'$n$')
 ax.set_zlabel(r'$\theta$')
 ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, best case')
+
+# Annotate points and values of theta
+for i in range(len(n)):
+    ax.text(epsilon[i], n[i], best_case_theta[i], f'{best_case_theta[i]:.2f}', color='black')
+
 plt.savefig('best_case_theta.pdf')
 
 fig = plt.figure()
@@ -47,4 +52,9 @@ ax.set_ylabel(r'$n$')
 ax.set_zlabel(r'$\theta$')
 ax.set_zlim(worst_case_theta.min(), worst_case_theta.max())  # Set z-axis limits
 ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, worst case')
+
+# Annotate points and values of theta
+for i in range(len(n)):
+    ax.text(epsilon[i], n[i], worst_case_theta[i], f'{worst_case_theta[i]:.2f}', color='black')
+
 plt.savefig('worst_case_theta.pdf')
