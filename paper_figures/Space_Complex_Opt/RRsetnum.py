@@ -38,9 +38,9 @@ ax.set_ylabel(r'$n$')
 ax.set_zlabel(r'$\theta$')
 ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, best case')
 
-# Annotate points and values of theta
+# Annotate points and values of theta, k, and epsilon
 for i in range(len(n)):
-    ax.text(epsilon[i], n[i], best_case_theta[i], f'{best_case_theta[i]:.2f}', color='black')
+    ax.text(epsilon[i]-.1, n[i], best_case_theta[i], fr'$\theta$={best_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}', color='red')
 
 plt.savefig('best_case_theta.pdf')
 
@@ -53,8 +53,8 @@ ax.set_zlabel(r'$\theta$')
 ax.set_zlim(worst_case_theta.min(), worst_case_theta.max())  # Set z-axis limits
 ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, worst case')
 
-# Annotate points and values of theta
+# Annotate points and values of theta, k, and epsilon
 for i in range(len(n)):
-    ax.text(epsilon[i], n[i], worst_case_theta[i], f'{worst_case_theta[i]:.2f}', color='black')
+    ax.text(epsilon[i]-.1, n[i], worst_case_theta[i], fr'$\theta$={worst_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}', color='red')
 
 plt.savefig('worst_case_theta.pdf')
