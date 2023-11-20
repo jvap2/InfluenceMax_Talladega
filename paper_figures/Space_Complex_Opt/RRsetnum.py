@@ -40,7 +40,7 @@ ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, best case')
 
 # Annotate points and values of theta, k, and epsilon
 for i in range(len(n)):
-    ax.text(epsilon[i]-.1, n[i], best_case_theta[i], fr'$\theta$={best_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}', color='red')
+    ax.text(epsilon[i]-.1, n[i], best_case_theta[i], fr'$\theta$={best_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}'+'\n'+fr'n={n[i]}', color='red')
 
 plt.savefig('best_case_theta.pdf')
 
@@ -55,6 +55,6 @@ ax.set_title(r'$\theta$ vs $\epsilon$ and $n$, worst case')
 
 # Annotate points and values of theta, k, and epsilon
 for i in range(len(n)):
-    ax.text(epsilon[i]-.1, n[i], worst_case_theta[i], fr'$\theta$={worst_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}', color='red')
+    ax.text(epsilon[i]-.1, n[i], worst_case_theta[i], fr'$\theta$={worst_case_theta[i]:.2f}'+'\n' + fr'k={k[i]}, $\epsilon$={epsilon[i]}'+'\n'+fr'n={n[i]}', color='red')
 
 plt.savefig('worst_case_theta.pdf')
