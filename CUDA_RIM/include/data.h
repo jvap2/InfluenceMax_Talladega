@@ -46,3 +46,9 @@ void readData(string filename, edge* edge_list);
 void get_graph_info(string path, unsigned int* nodes, unsigned int* edges);
 
 void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
+
+
+
+//CUDA
+
+__host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set);

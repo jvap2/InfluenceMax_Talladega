@@ -83,5 +83,20 @@ void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int
     for(unsigned int i = 1; i<=node_size; i++){
         csc[i] = csc[i-1] + csc_temp[i-1];
     }
+    delete[] csc_temp;
 }
 
+
+__host__ void Generate_Global_Src_Succ(unsigned int* start, unsigned int* end, unsigned int* src, unsigned int* succ, unsigned int node_size, unsigned int edge_size){
+    for(int i=0; i<edge_size;i++){
+        src[start[i]]++;
+        succ[i]=end[i];
+    }
+    //Now, we need to prefix sum the src_ptr
+    unsigned int* src_temp = new unsigned int[node_size+1]{0};
+    for(int i=1; i<node_size;i++){
+        src_temp[i]=src_temp[i-1]+src[i-1];
+    }
+    copy(src_temp, src_temp+node_size+1, src);
+    delete[] src_temp;
+}

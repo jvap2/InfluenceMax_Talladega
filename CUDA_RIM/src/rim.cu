@@ -44,14 +44,14 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     }
     unsigned int* d_csc;
     unsigned int* d_succ;
-    unsigned int* d_seed_set; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
+    unsigned int* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
     if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*node_size))){
         cout<<"Error allocating memory for d_csc"<<endl;
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_succ, sizeof(unsigned int)*edge_size))){
         cout<<"Error allocating memory for d_succ"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_seed_set, sizeof(unsigned int)*node_size))){
+    if(!HandleCUDAError(cudaMalloc((void**)&d_vec, sizeof(unsigned int)*node_size))){
         cout<<"Error allocating memory for d_seed_set"<<endl;
     }
 
