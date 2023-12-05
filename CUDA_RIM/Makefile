@@ -15,12 +15,10 @@ BIN := bin
 
 IMM: $(BIN)/IMM
 
-$(BIN)/IMM: $(OBJ)/main.o $(OBJ)/nodesel.o $(OBJ)/data.o $(OBJ)/sampling.o $(OBJ)/err.o
+$(BIN)/IMM: $(OBJ)/main.o $(OBJ)/rim.o $(OBJ)/data.o $(OBJ)/err.o
 	$(NVCC) $(LINK_FLAGS) $(INC_FLAGS) $^ -o $@
 
 
-$(OBJ)/nodesel.o: $(SRC)/nodeselection.cu
-	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/data.o: $(SRC)/dataprocessing.cpp
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
@@ -28,7 +26,7 @@ $(OBJ)/data.o: $(SRC)/dataprocessing.cpp
 $(OBJ)/main.o: $(SRC)/main.cpp
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-$(OBJ)/sampling.o: $(SRC)/sampling.cu 
+$(OBJ)/rim.o: $(SRC)/rim.cu 
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/err.o: $(INC)/GPUErrors.cu

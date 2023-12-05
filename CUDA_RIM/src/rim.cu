@@ -36,5 +36,7 @@ but would it be convenient to traverse both ways with a COO format?
 
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
+    float threshold = 0.75;
+    
     
 }
