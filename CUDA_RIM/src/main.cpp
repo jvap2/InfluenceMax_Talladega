@@ -1,4 +1,3 @@
-#include "../include/IMM.h"
 #include "../include/data.h"
 
 #include <string.h>
@@ -21,7 +20,18 @@ int main(int argc, char** argv)
     }
     else{
         if(strcmp(argv[1], "IC") == 0){
-            IMM_Ver1();
+            cout<<"Hello"<<endl;
+            unsigned int no_nodes, no_edges;
+            get_graph_info(HOMO_DATA_PATH, &no_nodes, &no_edges);
+            edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
+            readData(HOMO_PATH,edge_list);
+            unsigned int *csc, *succ;
+            csc = new unsigned int[no_nodes];
+            succ = new unsigned int[no_edges];
+            genCSC(edge_list,succ,csc,no_nodes,no_edges);
+            for (int i = 0; i<50; i++){
+                cout<<succ[i]<<endl;
+            }
         }
         else if(strcmp(argv[1],"LT")==0){
             cout<<"Incomplete, come back later"<<endl;

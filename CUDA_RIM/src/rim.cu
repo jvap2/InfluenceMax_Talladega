@@ -1,4 +1,3 @@
-#include "../include/IMM.h"
 #include "../include/data.h"
 /*The code for this come from Tang et al IMM Algorithm
 The psuedo code is as follows:
@@ -37,6 +36,24 @@ but would it be convenient to traverse both ways with a COO format?
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
     float threshold = 0.75;
-    
+    cudaStream_t* streams = (cudaStream_t*)malloc(sizeof(cudaStream_t)*NUMSTRM);
+    for(int i = 0; i < NUMSTRM; i++){
+        if(!HandleCUDAError(cudaStreamCreate(&streams[i]))){
+            cout<<"Error creating stream number "<<i<<endl;
+        }
+    }
+    unsigned int* d_csc;
+    unsigned int* d_succ;
+    unsigned int* d_seed_set; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
+    if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*node_size))){
+        cout<<"Error allocating memory for d_csc"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_succ, sizeof(unsigned int)*edge_size))){
+        cout<<"Error allocating memory for d_succ"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_seed_set, sizeof(unsigned int)*node_size))){
+        cout<<"Error allocating memory for d_seed_set"<<endl;
+    }
+
     
 }

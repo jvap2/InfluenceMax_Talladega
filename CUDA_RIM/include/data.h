@@ -6,16 +6,43 @@
 #include<algorithm>
 #include<cstdlib>
 #include<ctime>
+#include <cmath>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+#include <math.h>
+#include <curand.h>
+#include <curand_kernel.h>
+#include <cusparse_v2.h>
+#include <cublas_v2.h>
+#include <cublasLt.h>
+#include <thrust/device_ptr.h>
+#include <thrust/device_vector.h>
+#include <thrust/scan.h>
+#include <thrust/execution_policy.h>
+#include <thrust/unique.h>
+#include <thrust/functional.h>
+#include <thrust/sequence.h>
+#include <thrust/sort.h>
+#include "GPUErrors.h"
+
+#define TPB 256
+#define K 10
+
+#define NUMSTRM 4
+
+#define HOMO_PATH "../Graph_Data_Storage/homo.csv"
+#define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
+
 using namespace std;
-#include "IMM.h"
 
-#define homo_path "../Graph_Data_Storage/homo.csv"
-#define homo_data_path "../Graph_Data_Storage/homo_info.csv"
+struct edge{
+    unsigned int src;
+    unsigned int dst;
+};
 
-void readData(string filename, edge_t_IC* edge_list);
+void readData(string filename, edge* edge_list);
 
 void get_graph_info(string path, unsigned int* nodes, unsigned int* edges);
 
-void genCSC_LT(edge_t_LT* edge_list, node_t_LT* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
-
-void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
+void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);

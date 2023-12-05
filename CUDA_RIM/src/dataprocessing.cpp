@@ -1,7 +1,7 @@
 #include "../include/data.h"
 
 
-void readData(string filename, edge_t_IC* edge_list){
+void readData(string filename, edge* edge_list){
     ifstream data;
     data.open(filename);
     string line,word;
@@ -73,19 +73,7 @@ void get_graph_info(string path, unsigned int* nodes, unsigned int* edges){
 
 }
 
-void genCSC_LT(edge_t_LT* edge_list, node_t_LT* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
-    unsigned int* csc_temp = new unsigned int[node_size+1]{0};
-    for(unsigned int i = 0; i < edge_size; i++){
-        csc_temp[edge_list[i].dst.num]++;
-        succ[i] = edge_list[i].src;
-    }
-    csc[0] = 0;
-    for(unsigned int i = 1; i<=node_size; i++){
-        csc[i] = csc[i-1] + csc_temp[i-1];
-    }
-}
-
-void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
+void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
     unsigned int* csc_temp = new unsigned int[node_size+1]{0};
     for(unsigned int i = 0; i < edge_size; i++){
         csc_temp[edge_list[i].dst]++;
@@ -97,14 +85,3 @@ void genCSC_IC(edge_t_IC* edge_list, unsigned int* succ, unsigned int* csc, unsi
     }
 }
 
-void genCSC_IC_bit(edge_t_IC* edge_list, unsigned char* bit_f,unsigned int edge_size, unsigned int bitmap_size){
-    for(unsigned int i=0; i<edge_size; i++){
-        unsigned int row_idx = edge_list[i].src/8;
-        unsigned int row_offset = edge_list[i].src%8;
-        unsigned int col_idx = edge_list[i].dst/8;
-        unsigned int col_offset = col_idx%8;
-        bit_f[row_idx*bitmap_size+col_idx] |= (1<<col_offset);
-
-
-    }
-}
