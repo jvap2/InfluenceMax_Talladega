@@ -27,7 +27,7 @@ int main(int argc, char** argv)
             unsigned int *csc, *succ;
             csc = new unsigned int[no_nodes];
             succ = new unsigned int[no_edges];
-            genCSC(edge_list,succ,csc,no_nodes,no_edges);
+            genCSR(edge_list,csc,succ,no_nodes,no_edges);
             unsigned int* seed_set = new unsigned int[K];
             RIM_rand_Ver1(csc,succ,no_nodes,no_edges,seed_set);
         }

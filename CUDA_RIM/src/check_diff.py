@@ -43,3 +43,18 @@ def independent_cascade(graph, threshold, seed_set):
     # Set the all configuations
     model.set_initial_status(config)
     return model
+
+
+if __name__ == "__main__":
+    df = pd.read_csv("../Graph_Data_Storage/homo.csv")
+    src=df.loc[:,"source"].to_numpy()
+    dst=df.loc[:,"target"].to_numpy()
+    df_info = pd.read_csv("../../Graph_Data_Storage/homo_info.csv")
+    no_nodes = df_info.loc[:,"No. Nodes"].to_numpy()
+    no_nodes = no_nodes[0]
+    print(no_nodes)
+    adj_mat = np.zeros(shape=(no_nodes,no_nodes))
+    k=50
+    for s,d in zip(src,dst):
+        adj_mat[s][d]=1
+

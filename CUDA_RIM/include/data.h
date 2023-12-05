@@ -47,6 +47,8 @@ void get_graph_info(string path, unsigned int* nodes, unsigned int* edges);
 
 void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
 
+void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int node_size, unsigned int edge_size);
+
 
 
 //CUDA

@@ -57,3 +57,17 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
 
     
 }
+
+
+__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, unsigned int* vec, unsigned int* result, unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    if(tid < node_size){
+        unsigned int start = csc[tid];
+        unsigned int end = csc[tid+1];
+        unsigned int sum = 0;
+        for(int i = start; i < end; i++){
+            sum += vec[succ[i]];
+        }
+        result[tid] = sum;
+    }
+}
