@@ -54,3 +54,9 @@ void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int
 //CUDA
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set);
+
+__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* vec, float* result, unsigned int node_size);
+
+__global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
+
+__global__ void Init_Random(float* vec, float* rand_init, unsigned int size, unsigned int k);
