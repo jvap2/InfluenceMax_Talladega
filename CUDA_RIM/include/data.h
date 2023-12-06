@@ -29,7 +29,7 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 10
+#define K 500
 
 #define NUMSTRM 4
 
@@ -51,6 +51,9 @@ void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int
 
 void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int node_size, unsigned int edge_size);
 
+void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int edge_size);
+
+void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size);
 
 
 //CUDA
@@ -64,3 +67,5 @@ __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
 __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, unsigned int k);
 
 __host__ void Verify(float* gpu_vec, float* cpu_vec, unsigned int size);
+
+__host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge_list, unsigned int node_size, unsigned int edge_size);

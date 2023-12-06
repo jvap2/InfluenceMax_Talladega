@@ -28,8 +28,11 @@ int main(int argc, char** argv)
             csc = new unsigned int[no_nodes];
             succ = new unsigned int[no_edges];
             genCSR(edge_list,csc,succ,no_nodes,no_edges);
-            unsigned int* seed_set = new unsigned int[K];
-            RIM_rand_Ver1(csc,succ,no_nodes,no_edges,seed_set);
+            // unsigned int* seed_set = new unsigned int[no_nodes];
+            float* seed_set = new float[no_nodes];
+            CheckSparseMatVec(csc,succ,edge_list,no_nodes,no_edges);
+            // RIM_rand_Ver1(csc,succ,no_nodes,no_edges,seed_set);
+
         }
         else if(strcmp(argv[1],"LT")==0){
             cout<<"Incomplete, come back later"<<endl;

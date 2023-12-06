@@ -100,3 +100,18 @@ void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int
     copy(src_temp, src_temp+node_size+1, src);
     delete[] src_temp;
 }
+
+
+void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int edge_size){
+    for(int i=0; i<edge_size;i++){
+        adj[edge_list[i].src*node_size+edge_list[i].dst]=1.0f;
+    }
+}
+
+void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size){
+    for(int i=0; i<node_size;i++){
+        for(int j=0; j<node_size;j++){
+            h_y[i]+=h_A[i*node_size+j]*h_x[j];
+        }
+    }
+}
