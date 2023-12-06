@@ -62,3 +62,5 @@ __global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, flo
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
 
 __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, unsigned int k);
+
+__host__ void Verify(float* gpu_vec, float* cpu_vec, unsigned int size);

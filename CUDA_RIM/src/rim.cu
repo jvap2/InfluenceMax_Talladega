@@ -153,3 +153,16 @@ __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, uns
         vec[idx] = 1.0f;
     }
 }
+
+__host__ void Verify(float* gpu_vec, float* cpu_vec, unsigned int size){
+    float sum = 0.0f;
+    for(int i = 0; i < size; i++){
+        sum = (gpu_vec[i]-cpu_vec[i]);
+        if (sum > 0.0001f){
+            cout<<"Error at index "<<i<<endl;
+            cout<<"GPU: "<<gpu_vec[i]<<endl;
+            cout<<"CPU: "<<cpu_vec[i]<<endl;
+            return;
+        }
+    }
+}
