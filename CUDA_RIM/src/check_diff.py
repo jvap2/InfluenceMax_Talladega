@@ -58,3 +58,10 @@ if __name__ == "__main__":
     for s,d in zip(src,dst):
         adj_mat[s][d]=1
 
+    g = nx.from_numpy_array(adj_mat, create_using=nx.DiGraph())
+    seed_set = pd.read_csv("../RIM_res/res_4000.csv")
+    seeds = seed_set.loc[:,"Seed_Set"].to_numpy()
+    
+    
+
+

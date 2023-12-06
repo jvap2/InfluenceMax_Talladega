@@ -138,6 +138,7 @@ void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, stri
         cout<<"Cannot open file"<<endl;
     }
     if(data.is_open()){
+        data<<"Seed_Set"<<endl;
         for(int i=0; i<seed_size;i++){
             data<<seed_set[i]<<endl;
         }

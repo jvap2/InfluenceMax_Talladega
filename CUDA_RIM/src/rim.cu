@@ -56,28 +56,28 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
     float* d_res;
-    float* vec = new float[node_size];
-    float* values = new float[edge_size];
-    float* res = new float[node_size]; 
+    float* vec = new float[NUMSTRM*node_size];
+    float* values = new float[NUMSTRM*edge_size];
+    float* res = new float[NUMSTRM*node_size]; 
     float* tol = new float[NUMSTRM];
     float* sum = new float[NUMSTRM];
     float* l2_norm_d_vec = new float[NUMSTRM];
     float* l2_norm_rand_vec_init = new float[NUMSTRM];
     thrust::fill(sum, sum+NUMSTRM, 0.0f);
     thrust::fill(tol,tol+NUMSTRM, 100.0f);
-    thrust::fill(res, res+node_size, 0.0f);
-    thrust::fill(vec, vec+node_size, 1.0f/node_size);
-    thrust::fill(values, values+edge_size, 1.0f);
+    thrust::fill(res, res+NUMSTRM*node_size, 0.0f);
+    thrust::fill(vec, vec+NUMSTRM*node_size, 1.0f/node_size);
+    thrust::fill(values, values+NUMSTRM*edge_size, 1.0f);
     if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*(node_size+1)))){
         cout<<"Error allocating memory for d_csc"<<endl;
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_succ, sizeof(unsigned int)*(edge_size)))){
         cout<<"Error allocating memory for d_succ"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_vec, sizeof(float)*node_size))){
+    if(!HandleCUDAError(cudaMalloc((void**)&d_vec, sizeof(float)*node_size*NUMSTRM))){
         cout<<"Error allocating memory for d_seed_set"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_res, sizeof(float)*node_size))){
+    if(!HandleCUDAError(cudaMalloc((void**)&d_res, sizeof(float)*node_size*NUMSTRM))){
         cout<<"Error allocating memory for d_res"<<endl;
     }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*node_size, cudaMemcpyHostToDevice))){
@@ -86,14 +86,15 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMemcpy(d_succ, succ, sizeof(unsigned int)*edge_size, cudaMemcpyHostToDevice))){
         cout<<"Error copying succ to device"<<endl;
     }
-    if(!HandleCUDAError(cudaMemcpy(d_vec, vec, sizeof(float)*node_size, cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpy(d_vec, vec, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
         cout<<"Error copying vec to device"<<endl;
     }
     delete[] vec;
-    if(!HandleCUDAError(cudaMemcpy(d_res, res, sizeof(float)*node_size, cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpy(d_res, res, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
         cout<<"Error copying res to device"<<endl;
     }
     delete[] res;
+
     
     float* d_values;
     if(!HandleCUDAError(cudaMalloc((void**)&d_values, sizeof(float)*(edge_size)))){
@@ -166,6 +167,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
 
                 l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init, rand_vec_init + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                 l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
+
+                tol[i] = abs(l2_norm_d_vec[i]-l2_norm_rand_vec_init[i]);
 
 
                 sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size);
