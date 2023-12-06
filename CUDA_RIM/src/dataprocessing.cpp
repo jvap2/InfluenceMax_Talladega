@@ -94,7 +94,7 @@ void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int
     }
     //Now, we need to prefix sum the src_ptr
     unsigned int* src_temp = new unsigned int[node_size+1]{0};
-    for(int i=1; i<node_size;i++){
+    for(int i=1; i<=node_size;i++){
         src_temp[i]=src_temp[i-1]+src[i-1];
     }
     copy(src_temp, src_temp+node_size+1, src);
@@ -110,8 +110,10 @@ void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int ed
 
 void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size){
     for(int i=0; i<node_size;i++){
+        float temp=0.0f;
         for(int j=0; j<node_size;j++){
-            h_y[i]+=h_A[i*node_size+j]*h_x[j];
+            temp+=h_A[i*node_size+j]*h_x[j];
         }
+        h_y[i]=temp;
     }
 }

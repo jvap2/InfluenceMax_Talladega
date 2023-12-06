@@ -1,1 +1,3 @@
-See if we can utilize cuRipples for comparison
+-See if we can utilize cuRipples for comparison
+
+-Get scalar Sparse MatVec Mult to work, then try vector kernel

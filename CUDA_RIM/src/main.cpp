@@ -25,7 +25,7 @@ int main(int argc, char** argv)
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
             readData(HOMO_PATH,edge_list);
             unsigned int *csc, *succ;
-            csc = new unsigned int[no_nodes];
+            csc = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
             genCSR(edge_list,csc,succ,no_nodes,no_edges);
             // unsigned int* seed_set = new unsigned int[no_nodes];
