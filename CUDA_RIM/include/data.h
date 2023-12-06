@@ -29,12 +29,13 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 500
+#define K 25
 
-#define NUMSTRM 4
+#define NUMSTRM 6
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
+#define SEED_PATH "../RIM_Res/res_4000.csv"
 
 using namespace std;
 
@@ -56,6 +57,8 @@ void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int ed
 void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size);
 
 void Normalize_L2(float* h_x, unsigned int node_size);
+
+void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, string path);
 
 
 //CUDA

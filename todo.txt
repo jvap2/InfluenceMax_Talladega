@@ -1,3 +1,7 @@
 -See if we can utilize cuRipples for comparison
 
 -Get scalar Sparse MatVec Mult to work, then try vector kernel
+
+-The random initialization needs to have information passed in between the vectors
+
+-The pagerank version does not need information exchange
