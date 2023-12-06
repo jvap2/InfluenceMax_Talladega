@@ -24,6 +24,7 @@
 #include <thrust/functional.h>
 #include <thrust/sequence.h>
 #include <thrust/inner_product.h>
+#include <thrust/transform_reduce.h>
 #include <cmath>
 #include <thrust/sort.h>
 #include "GPUErrors.h"
