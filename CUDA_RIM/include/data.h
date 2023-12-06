@@ -23,6 +23,8 @@
 #include <thrust/unique.h>
 #include <thrust/functional.h>
 #include <thrust/sequence.h>
+#include <thrust/inner_product.h>
+#include <cmath>
 #include <thrust/sort.h>
 #include "GPUErrors.h"
 
@@ -55,7 +57,7 @@ void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set);
 
-__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* vec, float* result, unsigned int node_size);
+__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size);
 
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
 

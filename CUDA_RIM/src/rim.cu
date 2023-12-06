@@ -45,6 +45,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
+    float* d_res;
     if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*node_size))){
         cout<<"Error allocating memory for d_csc"<<endl;
     }
@@ -54,6 +55,9 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMalloc((void**)&d_vec, sizeof(float)*node_size))){
         cout<<"Error allocating memory for d_seed_set"<<endl;
     }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_res, sizeof(float)*node_size))){
+        cout<<"Error allocating memory for d_res"<<endl;
+    }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*node_size, cudaMemcpyHostToDevice))){
         cout<<"Error copying csc to device"<<endl;
     }
@@ -62,6 +66,9 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     }
     if(!HandleCUDAError(cudaMemset(d_vec, 1.0f/node_size, sizeof(float)*node_size))){
         cout<<"Error setting d_vec to 1/n"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemset(d_res, 0.0f, sizeof(float)*node_size))){
+        cout<<"Error setting d_res to 0"<<endl;
     }
     
     float* d_values;
@@ -89,21 +96,43 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMalloc((void**)&rand_vec_init, sizeof(float)*node_size))){
         std::cout<<"Error allocating memory for rand_vec_init"<<endl;
     } 
-    sparseCSRMat_Vec_Mult<<<num_blocks2,TPB>>>(d_csc, d_succ, d_values,d_vec, node_size);
-
-
-    
+    //Initialize the random vector
+    Init_Random<<<num_blocks, TPB>>>(rand_vec_init, rand_init, node_size, K);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
+    //Perform the first iteration of the algorithm
+    sparseCSRMat_Vec_Mult<<<num_blocks, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
+    // Add 1/n to the vector
+    Float_VectAdd<<<num_blocks, TPB>>>(d_vec, rand_vec_init, node_size);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(rand_vec_init, d_vec, sizeof(float)*node_size, cudaMemcpyDeviceToDevice))){
+        cout<<"Error copying d_vec to host"<<endl;
+    }
+    //Need to normalize the vector using thrust library
+    float sum = 0.0f;
+    sum = thrust::inner_product(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init, 0.0f);
+    sum = sqrt(sum);
+    thrust::transform(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init, thrust::placeholders::_1/sum);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
 }
 
 
-__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* vec, float* result, unsigned int node_size){
+__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
         unsigned int start = csc[t];
         unsigned int end = csc[t+1];
         unsigned int sum = 0;
         for(int i = start; i < end; i++){
-            sum += vec[succ[i]];
+            sum += values[i]*vec[succ[i]];
         }
         result[t] = sum;
     }
