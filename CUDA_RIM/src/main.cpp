@@ -29,10 +29,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             genCSR(edge_list,csc,succ,no_nodes,no_edges);
             // unsigned int* seed_set = new unsigned int[no_nodes];
-            float* seed_set = new float[K];
-            // CheckSparseMatVec(csc,succ,edge_list,no_nodes,no_edges);
+            unsigned int* seed_set = new unsigned int[K];
+            //CheckSparseMatVec(csc,succ,edge_list,no_nodes,no_edges);
             RIM_rand_Ver1(csc,succ,no_nodes,no_edges,seed_set);
-            Export_Seed_Set_to_CSV(seed_set,K,SEED_PATH);
+            // Export_Seed_Set_to_CSV(seed_set,K,SEED_PATH);
         }
         else if(strcmp(argv[1],"LT")==0){
             cout<<"Incomplete, come back later"<<endl;

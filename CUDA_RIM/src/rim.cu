@@ -36,13 +36,23 @@ but would it be convenient to traverse both ways with a COO format?
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
     float threshold = 0.75;
+    cudaDeviceProp prop;
+    int device;
+    cudaGetDevice(&device);  // Get the current device
+    cudaGetDeviceProperties(&prop, device);  // Get the properties of the device
+
+    int maxActiveBlocksPerMultiprocessor = prop.maxThreadsPerMultiProcessor / TPB;
+    int maxActiveBlocks = prop.multiProcessorCount * maxActiveBlocksPerMultiprocessor;
+    int blocks_per_stream = maxActiveBlocks/NUMSTRM;
+
+    printf("Max active blocks: %d\n", maxActiveBlocks);
     cudaStream_t* streams = (cudaStream_t*)malloc(sizeof(cudaStream_t)*NUMSTRM);
     for(int i = 0; i < NUMSTRM; i++){
         if(!HandleCUDAError(cudaStreamCreate(&streams[i]))){
             cout<<"Error creating stream number "<<i<<endl;
         }
     }
-        unsigned int* d_csc;
+    unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
     float* d_res;
@@ -50,6 +60,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     float* values = new float[edge_size];
     float* res = new float[node_size]; 
     float* tol = new float[NUMSTRM];
+    float* sum = new float[NUMSTRM];
+    thrust::fill(sum, sum+NUMSTRM, 0.0f);
     thrust::fill(tol,tol+NUMSTRM, 100.0f);
     thrust::fill(res, res+node_size, 0.0f);
     thrust::fill(vec, vec+node_size, 1.0f/node_size);
@@ -93,8 +105,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         cout<<"Error copying values to device"<<endl;
     }
 
-    unsigned int num_blocks = (node_size+TPB-1)/TPB;
-    unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
+    // unsigned int num_blocks = (node_size+TPB-1)/TPB;
+    // unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
     float* rand_init;
     if(!HandleCUDAError(cudaMalloc((void**)&rand_init, K*sizeof(float)))){
         std::cout<<"Error allocating memory for rand_frog"<<endl;
@@ -115,33 +127,46 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMemcpy(rand_vec_init, h_rand_vec_init, sizeof(float)*node_size, cudaMemcpyHostToDevice))){
         cout<<"Error copying h_rand_vec_init to device"<<endl;
     }
-    //Initialize the random vector
-    Init_Random<<<num_blocks, TPB>>>(rand_vec_init, rand_init, node_size, K);
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device"<<endl;
-    }
-    //Perform the first iteration of the algorithm
-    sparseCSRMat_Vec_Mult<<<num_blocks, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device"<<endl;
-    }
+    while(tol[0] > threshold && tol[1] > threshold && tol[2] > threshold && tol[3] > threshold && tol[4] > threshold && tol[5] > threshold){
+        for(int i = 0; i < NUMSTRM; i++){
 
-    // Just Verify that the multiplication is working
+            //Initialize the random vector
+            if(tol[i] > threshold){
+                Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init, rand_init, node_size, K);
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                    cout<<"Error synchronizing device"<<endl;
+                }
+            }
+        }
+        for(int i = 0; i < NUMSTRM; i++){
+            //Perform the first iteration of the algorithm
+            if(tol[i] > threshold){
+                sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                    cout<<"Error synchronizing device"<<endl;
+                }
+            }
+        }
+            // Just Verify that the multiplication is working
+        for(int i = 0; i < NUMSTRM; i++){
+            // Add 1/n to the vector
+            if(tol[i] > threshold){
+                Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(d_vec, rand_vec_init, node_size);
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                    cout<<"Error synchronizing device"<<endl;
+                }
+                if(!HandleCUDAError(cudaMemcpy(rand_vec_init, d_vec, sizeof(float)*node_size, cudaMemcpyDeviceToDevice))){
+                    cout<<"Error copying d_vec to host"<<endl;
+                }
+                //Need to normalize the vector using thrust library
 
-    // Add 1/n to the vector
-    Float_VectAdd<<<num_blocks, TPB>>>(d_vec, rand_vec_init, node_size);
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device"<<endl;
-    }
-    if(!HandleCUDAError(cudaMemcpy(rand_vec_init, d_vec, sizeof(float)*node_size, cudaMemcpyDeviceToDevice))){
-        cout<<"Error copying d_vec to host"<<endl;
-    }
-    //Need to normalize the vector using thrust library
-    float sum = 0.0f;
-    sum = thrust::reduce(thrust::device, rand_vec_init, rand_vec_init+node_size);
-    thrust::transform(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init, thrust::placeholders::_1/sum);
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device"<<endl;
+                sum[0] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size);
+                thrust::transform(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size, rand_vec_init, thrust::placeholders::_1/sum);
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                    cout<<"Error synchronizing device"<<endl;
+                }
+            }
+        }
     }
 }
 
@@ -158,6 +183,22 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
     thrust::fill(res, res+node_size, 0.0f);
     thrust::fill(vec, vec+node_size, 1.0f/node_size);
     thrust::fill(values, values+edge_size, 1.0f);
+    cudaDeviceProp prop;
+    int device;
+    cudaGetDevice(&device);  // Get the current device
+    cudaGetDeviceProperties(&prop, device);  // Get the properties of the device
+
+    int maxActiveBlocksPerMultiprocessor = prop.maxThreadsPerMultiProcessor / TPB;
+    int maxActiveBlocks = prop.multiProcessorCount * maxActiveBlocksPerMultiprocessor;
+    int blocks_per_stream = maxActiveBlocks/NUMSTRM;
+
+    printf("Max active blocks: %d\n", maxActiveBlocks);
+    cudaStream_t* streams = (cudaStream_t*)malloc(sizeof(cudaStream_t)*NUMSTRM);
+    for(int i = 0; i < NUMSTRM; i++){
+        if(!HandleCUDAError(cudaStreamCreate(&streams[i]))){
+            cout<<"Error creating stream number "<<i<<endl;
+        }
+    }
     if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*(node_size+1)))){
         cout<<"Error allocating memory for d_csc"<<endl;
     }
@@ -197,8 +238,6 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
     //     cout<<"Error copying values to device"<<endl;
     // }
 
-    unsigned int num_blocks = (node_size+TPB-1)/TPB;
-    unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
     float* rand_init;
     if(!HandleCUDAError(cudaMalloc((void**)&rand_init, K*sizeof(float)))){
         std::cout<<"Error allocating memory for rand_frog"<<endl;
@@ -220,16 +259,16 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
         cout<<"Error copying h_rand_vec_init to device"<<endl;
     }
     //Initialize the random vector
-    Init_Random<<<num_blocks, TPB>>>(rand_vec_init, rand_init, node_size, K);
+    Init_Random<<<blocks_per_stream, TPB>>>(rand_vec_init, rand_init, node_size, K);
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         cout<<"Error synchronizing device"<<endl;
     }
     //Perform the first iteration of the algorithm
-    sparseCSRMat_Vec_Mult<<<num_blocks, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
+    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         cout<<"Error synchronizing device"<<endl;
     }
-    Float_VectAdd<<<num_blocks, TPB>>>(d_res, d_vec, node_size);
+    Float_VectAdd<<<blocks_per_stream, TPB>>>(d_res, d_vec, node_size);
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         cout<<"Error synchronizing device"<<endl;
     }
