@@ -14,18 +14,18 @@ __global__ void Init_P(float* P, unsigned int node_size, float* damp){
     }
 }
 
-__global__ void Gen_P(float* weight_P,edge* edgelist, unsigned int* src, unsigned int node_size, float* damp){
-    unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
-    if(x < node_size){
-        unsigned int start = edgelist[x].src;
-        unsigned int end = edgelist[x].dst;
-        unsigned int out = src[start+1]-src[start];
-        if(out!=0){
-            weight_P[end*node_size+start]+=(1.0-*damp)/(out*1.0);
-        }
-    }
+// __global__ void Gen_P(float* weight_P,edge* edgelist, unsigned int* src, unsigned int node_size, float* damp){
+//     unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
+//     if(x < node_size){
+//         unsigned int start = edgelist[x].src;
+//         unsigned int end = edgelist[x].dst;
+//         unsigned int out = src[start+1]-src[start];
+//         if(out!=0){
+//             weight_P[end*node_size+start]+=(1.0-*damp)/(out*1.0);
+//         }
+//     }
 
-}
+// }
 
 
 __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp){

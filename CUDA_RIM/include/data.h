@@ -74,3 +74,11 @@ __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, uns
 __host__ void Verify(float* gpu_vec, float* cpu_vec, unsigned int size);
 
 __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge_list, unsigned int node_size, unsigned int edge_size);
+
+__host__ void PageRank(float* pr_vector, unsigned int* h_indices, unsigned int* global_src, unsigned int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time);
+
+__global__ void Init_Pr(float* pr_vector, unsigned int node_size);
+
+__global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp);
+
+__global__ void Init_P(float* P, unsigned int node_size, float* damp);
