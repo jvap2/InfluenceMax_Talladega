@@ -49,6 +49,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     float* vec = new float[node_size];
     float* values = new float[edge_size];
     float* res = new float[node_size]; 
+    float* tol = new float[NUMSTRM];
+    thrust::fill(tol,tol+NUMSTRM, 100.0f);
     thrust::fill(res, res+node_size, 0.0f);
     thrust::fill(vec, vec+node_size, 1.0f/node_size);
     thrust::fill(values, values+edge_size, 1.0f);
@@ -136,8 +138,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     }
     //Need to normalize the vector using thrust library
     float sum = 0.0f;
-    sum = thrust::inner_product(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init, 0.0f);
-    sum = sqrt(sum);
+    sum = thrust::reduce(thrust::device, rand_vec_init, rand_vec_init+node_size);
     thrust::transform(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init, thrust::placeholders::_1/sum);
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         cout<<"Error synchronizing device"<<endl;
