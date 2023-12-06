@@ -55,6 +55,8 @@ void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int ed
 
 void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size);
 
+void Normalize_L2(float* h_x, unsigned int node_size);
+
 
 //CUDA
 

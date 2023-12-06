@@ -192,9 +192,9 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
         cout<<"Error copying values to device"<<endl;
     }
     // delete[] values;
-    if(!HandleCUDAError(cudaMemcpy(values,d_values, sizeof(float)*edge_size, cudaMemcpyDeviceToHost))){
-        cout<<"Error copying values to device"<<endl;
-    }
+    // if(!HandleCUDAError(cudaMemcpy(values,d_values, sizeof(float)*edge_size, cudaMemcpyDeviceToHost))){
+    //     cout<<"Error copying values to device"<<endl;
+    // }
 
     unsigned int num_blocks = (node_size+TPB-1)/TPB;
     unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
@@ -228,6 +228,10 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         cout<<"Error synchronizing device"<<endl;
     }
+    Float_VectAdd<<<num_blocks, TPB>>>(d_res, d_vec, node_size);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
     if(!HandleCUDAError(cudaMemcpy(h_rand_vec_init, rand_vec_init, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
         cout<<"Error copying d_vec to host"<<endl;
     }
@@ -241,6 +245,22 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
     float* A = (float*)malloc(sizeof(float)*node_size*node_size);
     GenAdj(edge_list, A, node_size, edge_size);
     h_MatVecMult(A, h_rand_vec_init, h_res_CPU, node_size);
+    float* support_vec = new float[node_size];
+    thrust::fill(support_vec, support_vec+node_size, 1.0f/node_size);
+    for(int i = 0; i < node_size; i++){
+        h_res_CPU[i] += support_vec[i];
+    }
+    float sum = 0.0f;
+    sum = thrust::inner_product(thrust::device, d_res, d_res+node_size, d_res, 0.0f);
+    sum = sqrt(sum);
+    thrust::transform(thrust::device, d_res, d_res+node_size, d_res, thrust::placeholders::_1/sum);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(h_res_GPU, d_res, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
+        cout<<"Error copying d_vec to host"<<endl;
+    }
+    Normalize_L2(h_res_CPU, node_size);
     Verify(h_res_GPU, h_res_CPU, node_size);
 
 }

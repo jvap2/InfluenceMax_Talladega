@@ -117,3 +117,30 @@ void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size){
         h_y[i]=temp;
     }
 }
+
+void Normalize_L2(float* h_x, unsigned int node_size){
+    float norm=0.0f;
+    for(int i=0; i<node_size;i++){
+        norm+=h_x[i]*h_x[i];
+    }
+    norm=sqrt(norm);
+    cout<<"CPU Norm: "<<norm<<endl;
+    for(int i=0; i<node_size;i++){
+        h_x[i]=h_x[i]/norm;
+    }
+}
+
+
+void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, string path){
+    ofstream data;
+    data.open(path);
+    if(!data.is_open()){
+        cout<<"Cannot open file"<<endl;
+    }
+    if(data.is_open()){
+        for(int i=0; i<seed_size;i++){
+            data<<seed_set[i]<<endl;
+        }
+    }
+    data.close();
+}

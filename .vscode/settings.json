@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.bison": "bison",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "ostream": "cpp"
     }
 }
