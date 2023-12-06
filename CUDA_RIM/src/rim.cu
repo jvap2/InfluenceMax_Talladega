@@ -33,6 +33,15 @@ but would it be convenient to traverse both ways with a COO format?
 
 */
 
+__device__ float eval_values(float rand_num, float val,float threshold){
+    if(rand_num > threshold){
+        return val;
+    }
+    else{
+        return 0.0f;
+    }
+}
+
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
     float threshold = 0.75;
@@ -130,6 +139,10 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMemcpy(rand_vec_init, h_rand_vec_init, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
         cout<<"Error copying h_rand_vec_init to device"<<endl;
     }
+    float* rand_numbers;
+    if (!HandleCUDAError(cudaMalloc((void**)&rand_numbers, sizeof(float) * edge_size*NUMSTRM))) {
+        cout << "Error allocating memory for rand_numbers" << endl;
+    }
     for(int i = 0; i < epochs; i++){
         while(tol[0] > threshold && tol[1] > threshold && tol[2] > threshold && tol[3] > threshold && tol[4] > threshold && tol[5] > threshold){
             for(int i = 0; i < NUMSTRM; i++){
@@ -146,13 +159,23 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
                 if(tol[i] > threshold){
+                    float* rand_numbers_i = rand_numbers + i*NUMSTRM;
+                    curandGenerator_t gen;
+                    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+                    srand(time(0));
+                    int rand_seed = rand();
+                    curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
+                    curandGenerateUniform(gen, rand_numbers_i, edge_size);
+                    curandDestroyGenerator(gen);
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
+                    thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
                     sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                     }
+                    thrust::fill(thrust::device.on(streams[i]), d_values_i, d_values_i+edge_size, 1.0f);
                 }
             }
                 // Just Verify that the multiplication is working
@@ -165,9 +188,6 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
                     }
-                    if(!HandleCUDAError(cudaMemcpy(rand_vec_init, d_vec, sizeof(float)*node_size, cudaMemcpyDeviceToDevice))){
-                        cout<<"Error copying d_vec to host"<<endl;
-                    }
                     //Need to normalize the vector using thrust library
 
                     l2_norm_d_vec[i] = thrust::transform_reduce(thrust::device, d_vec, d_vec + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
@@ -177,16 +197,28 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                     l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
 
                     tol[i] = abs(l2_norm_d_vec[i]-l2_norm_rand_vec_init[i]);
+                    if(!HandleCUDAError(cudaMemcpy(rand_vec_init, d_vec, sizeof(float)*node_size, cudaMemcpyDeviceToDevice))){
+                        cout<<"Error copying d_vec to host"<<endl;
+                    }
 
 
                     sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size);
-                    thrust::transform(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size, rand_vec_init, thrust::placeholders::_1/sum);
+                    thrust::transform(thrust::device.on(streams[i]), rand_vec_init, rand_vec_init+node_size, rand_vec_init, [=] __device__ (float x) { return x/sum[i]; });
                     thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         cout<<"Error synchronizing device"<<endl;
                     }
                 }
             }
+        }
+        
+        thrust::plus<float> op;
+        switch(epochs%NUMSTRM){
+            case 0:
+                thrust::transform(thrust::device, rand_vec_init+(NUMSTRM-1)*edge_size, rand_vec_init+(NUMSTRM)*edge_size, rand_vec_init, [threshold] __device__ (float x) { return x + 0.15f * x; });
+            default:
+                thrust::transform(thrust::device, rand_vec_init+(epochs%NUMSTRM)*edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size+edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size, [threshold] __device__ (float x) { return x + 0.15f * x; });
+            
         }
     }
 }
