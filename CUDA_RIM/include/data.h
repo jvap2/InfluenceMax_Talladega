@@ -40,6 +40,8 @@
 #define SEED_PATH "../RIM_res/res_4000.csv"
 #define ARVIX_PATH "../Graph_Data_Storage/ca-GrQc.csv"
 #define ARVIX_DATA_PATH "../Graph_Data_Storage/ca-GrQc-data.csv"
+#define ARVIX_SEED_PATH "../RIM_res/res_arvix.csv"
+
 
 using namespace std;
 

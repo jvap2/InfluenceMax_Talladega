@@ -12,7 +12,7 @@ g = nx.read_edgelist(
     nodetype=int
 )
 
-seed_set = pd.read_csv("../../RIM_res/res_4000.csv")
+seed_set = pd.read_csv("../../RIM_res/res_arvix_new.csv")
 seeds = seed_set.loc[:,"Seed_Set"].to_numpy()
 print("Seeds:",seeds)
 ## Run several simulations to evaluate the spread

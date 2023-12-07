@@ -143,6 +143,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     if (!HandleCUDAError(cudaMalloc((void**)&rand_numbers, sizeof(float) * edge_size*NUMSTRM))) {
         cout << "Error allocating memory for rand_numbers" << endl;
     }
+    printCudaMemoryUsage();
     for(int i = 0; i < epochs; i++){
         cout<<"Epoch "<<i<<endl;
         thrust::fill(tol,tol+NUMSTRM, 100.0f);

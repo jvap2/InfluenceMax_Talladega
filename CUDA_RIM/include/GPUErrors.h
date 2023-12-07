@@ -13,4 +13,5 @@ bool HandleCUDAError(cudaError_t t);//This handles the cuda error
 bool GetCUDARunTimeError();//This gets error from the GPU
 bool HandleCUSparseError(cusparseStatus_t t);//This handles the cusparse error
 bool HandleCUBLASError(cublasStatus_t t);//This handles the cublas error
+void printCudaMemoryUsage();
 //Any assignment, use the error handling everytime
