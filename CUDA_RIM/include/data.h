@@ -38,6 +38,8 @@
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
 #define SEED_PATH "../RIM_res/res_4000.csv"
+#define ARVIX_PATH "../Graph_Data_Storage/ca-GrQc.csv"
+#define ARVIX_DATA_PATH "../Graph_Data_Storage/ca-GrQc-data.csv"
 
 using namespace std;
 
