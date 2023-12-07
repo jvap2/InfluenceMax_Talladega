@@ -61,7 +61,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
             cout<<"Error creating stream number "<<i<<endl;
         }
     }
-    unsigned int epochs=20;
+    unsigned int num_walker = node_size/20;
+    unsigned int epochs=30;
     unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
@@ -119,7 +120,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     // // unsigned int num_blocks = (node_size+TPB-1)/TPB;
     // // unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
     float* rand_init;
-    if(!HandleCUDAError(cudaMalloc((void**)&rand_init, NUMSTRM*K*sizeof(float)))){
+    if(!HandleCUDAError(cudaMalloc((void**)&rand_init, NUMSTRM*num_walker*sizeof(float)))){
         std::cout<<"Error allocating memory for rand_frog"<<endl;
     }
     curandGenerator_t gen;
@@ -127,7 +128,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     srand(time(0));
     int rand_seed = rand();
     curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
-    curandGenerateUniform(gen, rand_init, K);
+    curandGenerateUniform(gen, rand_init, num_walker*NUMSTRM);
     /*Now, we have the random numbers generated*/
     curandDestroyGenerator(gen);
     float* rand_vec_init;
@@ -150,9 +151,9 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         int while_count = 0;
         for(int i = 0; i < NUMSTRM; i++){
             //Initialize the random vector
-            float* rand_init_i = rand_init + i*K;
+            float* rand_init_i = rand_init + i*num_walker;
             float* rand_vec_init_i = rand_vec_init + i*node_size;
-            Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, K);
+            Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
             if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                 cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
             }
@@ -160,14 +161,6 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         while_count=0;
         while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
             while_count++;
-            if(while_count%100 == 0){
-                cout<<"tol[0]: "<<tol[0]<<endl;
-                cout<<"tol[1]: "<<tol[1]<<endl;
-                cout<<"tol[2]: "<<tol[2]<<endl;
-                cout<<"tol[3]: "<<tol[3]<<endl;
-                cout<<"tol[4]: "<<tol[4]<<endl;
-                cout<<"tol[5]: "<<tol[5]<<endl;
-            }
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
                 if(tol[i] > threshold){
