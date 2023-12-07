@@ -34,7 +34,7 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 30
+#define K 100
 
 #define NUMSTRM 6
 
@@ -44,6 +44,9 @@
 #define ARVIX_PATH "../Graph_Data_Storage/ca-GrQc.csv"
 #define ARVIX_DATA_PATH "../Graph_Data_Storage/ca-GrQc-data.csv"
 #define ARVIX_SEED_PATH "../RIM_res/res_arvix.csv"
+#define WIKI_VOTE_PATH "../Graph_Data_Storage/wikivote.csv"
+#define WIKI_VOTE_DATA_PATH "../Graph_Data_Storage/wikivote_data.csv"
+#define WIKI_VOTE_SEED_PATH "../RIM_res/res_wiki.csv"
 
 
 using namespace std;

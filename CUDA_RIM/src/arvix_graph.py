@@ -30,7 +30,7 @@ lt_iterations = lt_model.iteration_bunch(lt_num_steps)
 # in the last step
 print("Final Spread, LT",lt_iterations[-1]["node_count"])
 
-ic_num_steps = 50
+ic_num_steps = 100
 # Number of nodes in the seed set
 ic_seed_set_size = 30
 # Determine the seed set
