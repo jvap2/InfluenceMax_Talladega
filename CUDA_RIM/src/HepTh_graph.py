@@ -44,7 +44,7 @@ ic_iterations = ic_model_1.iteration_bunch(ic_num_steps)
 spread_1 = []
 for iteration in ic_iterations:
     spread_1.append(iteration['node_count'][1])
-print("Final Spread, Rand RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
+print("IC Final Spread, Rand RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
 
 
 vr = voterank(g, number_of_nodes=ic_seed_set_size)

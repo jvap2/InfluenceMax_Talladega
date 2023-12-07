@@ -47,8 +47,8 @@
 #define WIKI_VOTE_PATH "../Graph_Data_Storage/wikivote.csv"
 #define WIKI_VOTE_DATA_PATH "../Graph_Data_Storage/wikivote_data.csv"
 #define WIKI_VOTE_SEED_PATH "../RIM_res/res_wiki.csv"
-#define HEPTH_PATH "../RIM_res/ca-HepTh.csv"
-#define HEPTH_DATA_PATH "../RIM_res/ca-HepTh-data.csv"
+#define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh.csv"
+#define HEPTH_DATA_PATH "../Graph_Data_Storage/ca-HepTh-data.csv"
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
 
 

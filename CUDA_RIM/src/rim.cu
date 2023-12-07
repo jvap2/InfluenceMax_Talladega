@@ -44,7 +44,7 @@ __device__ float eval_values(float rand_num, float val,float threshold){
 
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
-    float threshold = 0.75;
+    float threshold = 0.8;
     cudaDeviceProp prop;
     int device;
     cudaGetDevice(&device);  // Get the current device
