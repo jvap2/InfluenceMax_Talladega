@@ -36,7 +36,7 @@
 #define TPB 256
 #define K 100
 
-#define NUMSTRM 6
+#define NUMSTRM 12
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"

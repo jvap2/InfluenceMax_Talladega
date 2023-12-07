@@ -1,7 +1,7 @@
 #!/bin/sh
 
 make clean
-make IMM
+make PLN
 ./bin/IMM IC
 cd src
 python3 check_diff.py

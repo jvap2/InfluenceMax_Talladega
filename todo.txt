@@ -5,3 +5,5 @@
 -The random initialization needs to have information passed in between the vectors
 
 -The pagerank version does not need information exchange
+
+-Does terrible with Arvix Data set
