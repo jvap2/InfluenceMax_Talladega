@@ -11,9 +11,6 @@ for seed in seeds:
     new_seeds.append(mapping[seed])
 
 
-print(seeds)
-print(new_seeds)
-
 new_df = pd.DataFrame(list(zip(new_seeds)), columns=["Seed_Set"])
 new_df.to_csv("../../RIM_res/res_arvix_new.csv", index=False)
 

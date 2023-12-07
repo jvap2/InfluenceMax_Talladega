@@ -28,10 +28,13 @@
 #include <thrust/set_operations.h>
 #include <cmath>
 #include <thrust/sort.h>
+#include <thrust/logical.h>
+#include <thrust/functional.h>
+#include <thrust/execution_policy.h>
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 25
+#define K 30
 
 #define NUMSTRM 6
 

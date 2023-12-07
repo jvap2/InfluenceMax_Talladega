@@ -33,7 +33,7 @@ print("Final Spread, LT",lt_iterations[-1]["node_count"])
 
 ic_num_steps = 50
 # Number of nodes in the seed set
-ic_seed_set_size = 25
+ic_seed_set_size = 30
 # Determine the seed set
 # Determine the model parameter
 ic_threshold = 0.5

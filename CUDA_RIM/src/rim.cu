@@ -61,7 +61,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
             cout<<"Error creating stream number "<<i<<endl;
         }
     }
-    unsigned int epochs=30;
+    unsigned int epochs=20;
     unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
@@ -157,7 +157,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                 cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
             }
         }
-        while(tol[0] > threshold && tol[1] > threshold && tol[2] > threshold && tol[3] > threshold && tol[4] > threshold && tol[5] > threshold){
+        while_count=0;
+        while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
             while_count++;
             if(while_count%100 == 0){
                 cout<<"tol[0]: "<<tol[0]<<endl;
@@ -201,7 +202,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                     }
                     //Need to normalize the vector using thrust library
 
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res, d_res + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
 
                     l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
