@@ -7,3 +7,7 @@
 -The pagerank version does not need information exchange
 
 -Does terrible with Arvix Data set
+
+- The parameters we want to tune and examine include streams, K, damping factor, and threshold
+
+- The measurements we want from this include percentage of flow and time

@@ -43,8 +43,17 @@ __device__ float eval_values(float rand_num, float val,float threshold){
 }
 
 
-__host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set){
+__host__ void Save_Data(string file, float time, float damping_factor, float threshold){
+    ofstream myfile;
+    myfile.open(file, std::ios_base::app);
+    myfile<<"Time, Damping Factor, Threshold"<<endl;
+    myfile<<time<<","<<damping_factor<<","<<threshold<<","<<K;
+    myfile.close();
+}
+
+__host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file){
     float threshold = 0.8;
+    float damping_factor = 0.15;
     cudaDeviceProp prop;
     int device;
     cudaGetDevice(&device);  // Get the current device
@@ -145,6 +154,10 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         cout << "Error allocating memory for rand_numbers" << endl;
     }
     printCudaMemoryUsage();
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
     for(int i = 0; i < epochs; i++){
         cout<<"Epoch "<<i<<endl;
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
@@ -214,17 +227,20 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         }
         switch(epochs%NUMSTRM){
             case 0:
-                thrust::transform(thrust::device, rand_vec_init+(NUMSTRM-1)*edge_size, rand_vec_init+(NUMSTRM)*edge_size, rand_vec_init, [threshold] __device__ (float x) { return x + 0.15f * x; });
+                thrust::transform(thrust::device, rand_vec_init+(NUMSTRM-1)*edge_size, rand_vec_init+(NUMSTRM)*edge_size, rand_vec_init, [damping_factor] __device__ (float x) { return x + damping_factor * x; });
                 break;
             default:
-                thrust::transform(thrust::device, rand_vec_init+(epochs%NUMSTRM)*edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size+edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size, [threshold] __device__ (float x) { return x + 0.15f * x; });
+                thrust::transform(thrust::device, rand_vec_init+(epochs%NUMSTRM)*edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size+edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size, [damping_factor] __device__ (float x) { return x + damping_factor * x; });
                 break;
             
         }
     }
-    // if(!HandleCUDAError(cudaMemcpy(h_rand_vec_init, rand_vec_init, sizeof(float)*node_size*NUMSTRM, cudaMemcpyDeviceToHost))){
-    //     cout<<"Error copying d_vec to host"<<endl;
-    // }
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    cout<<"Time taken: "<<milliseconds<<endl;
+    Save_Data(file, milliseconds, damping_factor, threshold);
     if(!HandleCUDAError(cudaFree(d_csc))){
         cout<<"Error freeing d_csc"<<endl;
     }
@@ -269,8 +285,6 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
             cout<<"Error destroying stream number "<<i<<endl;
         }
     }
-
-
 }
 
 

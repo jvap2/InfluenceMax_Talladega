@@ -50,6 +50,10 @@
 #define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh.csv"
 #define HEPTH_DATA_PATH "../Graph_Data_Storage/ca-HepTh-data.csv"
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
+#define HEPTH_DATA_MEASURE "../RIM_data/HepTh/meas.csv"
+#define WIKI_VOTE_DATA_MEASURE "../RIM_data/wiki-vote/meas.csv"
+#define ARVIX_DATA_MEASURE "../RIM_data/ARVIX/meas.csv"
+#define HOMO_DATA_MEASURE "../RIM_data/syn/meas.csv"
 
 
 using namespace std;
@@ -76,9 +80,12 @@ void Normalize_L2(float* h_x, unsigned int node_size);
 void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, string path);
 
 
+__host__ void Save_Data(string file, float time, float damping_factor, float threshold);
+
+
 //CUDA
 
-__host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set);
+__host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
 
 __global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size);
 
