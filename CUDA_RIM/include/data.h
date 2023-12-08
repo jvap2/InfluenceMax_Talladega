@@ -52,7 +52,7 @@
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
 #define HEPTH_DATA_MEASURE "../RIM_data/HepTh/meas.csv"
 #define WIKI_VOTE_DATA_MEASURE "../RIM_data/wiki-vote/meas.csv"
-#define ARVIX_DATA_MEASURE "../RIM_data/ARVIX/meas.csv"
+#define ARVIX_DATA_MEASURE "../RIM_data/arvix/meas.csv"
 #define HOMO_DATA_MEASURE "../RIM_data/syn/meas.csv"
 
 

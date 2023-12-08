@@ -46,14 +46,13 @@ __device__ float eval_values(float rand_num, float val,float threshold){
 __host__ void Save_Data(string file, float time, float damping_factor, float threshold){
     ofstream myfile;
     myfile.open(file, std::ios_base::app);
-    myfile<<"Time, Damping Factor, Threshold"<<endl;
     myfile<<time<<","<<damping_factor<<","<<threshold<<","<<K;
     myfile.close();
 }
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file){
     float threshold = 0.8;
-    float damping_factor = 0.15;
+    float damping_factor = 0.35;
     cudaDeviceProp prop;
     int device;
     cudaGetDevice(&device);  // Get the current device

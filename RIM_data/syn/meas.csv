@@ -1,1 +1,4 @@
-time,damping_factor,threshold,K,percent_LT,percent_IC
+time(ms),damping_factor,threshold,K,percent_LT,percent_IC
+38.5122,0.15,0.8,100.0,0.97775,0.97775
+38.5052,0.25,0.8,100.0,0.9725,0.977
+38.7036,0.3,0.8,100.0,0.97725,0.97725

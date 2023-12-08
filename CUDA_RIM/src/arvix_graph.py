@@ -30,7 +30,6 @@ lt_iterations = lt_model.iteration_bunch(lt_num_steps)
 # in the last step
 print("Final Spread, LT",lt_iterations[-1]["node_count"])
 
-percent_lt_spread = lt_iterations[-1]["node_count"][1]/len(g.nodes())
 
 ic_num_steps = 100
 # Number of nodes in the seed set
@@ -48,13 +47,14 @@ for iteration in ic_iterations:
     spread_1.append(iteration['node_count'][1])
 print("Final Spread, Rand RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
 
-percent_ic_spread = ic_iterations[-1]["node_count"][1]/len(g.nodes())
+percent_lt_spread = lt_iterations[-1]["node_count"][1]/len(g.nodes())
+percent_ic_spread = (ic_iterations[-1]["node_count"][2]+ic_iterations[-1]["node_count"][1])/len(g.nodes())
 print("Percent Spread, LT, IC",percent_lt_spread, percent_ic_spread)
 
 exec_data = pd.read_csv("../../RIM_data/arvix/meas.csv")
 test_trial=exec_data.shape[0]
-exec_data["percent_LT"].iloc[test_trial-1]=percent_lt_spread
-exec_data["percent_IC"].iloc[test_trial-1]=percent_ic_spread
+exec_data.loc[test_trial-1, "percent_LT"] = percent_lt_spread
+exec_data.loc[test_trial-1, "percent_IC"] = percent_ic_spread
 exec_data.to_csv("../../RIM_data/arvix/meas.csv",index=False)
 
 
