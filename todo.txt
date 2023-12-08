@@ -11,3 +11,7 @@
 - The parameters we want to tune and examine include streams, K, damping factor, and threshold
 
 - The measurements we want from this include percentage of flow and time
+
+- Need to add to the python files to deal with the flow measurements
+
+- See what other influence algorithms networkx has at least
