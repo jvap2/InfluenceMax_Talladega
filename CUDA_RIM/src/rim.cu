@@ -362,8 +362,6 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     // delete[] values;
 
 
-    // // unsigned int num_blocks = (node_size+TPB-1)/TPB;
-    // // unsigned int num_blocks2 = (edge_size+TPB-1)/TPB;
     float* rand_init;
     if(!HandleCUDAError(cudaMalloc((void**)&rand_init, NUMSTRM*num_walker*sizeof(float)))){
         std::cout<<"Error allocating memory for rand_frog"<<endl;
@@ -385,6 +383,17 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaMemcpy(rand_vec_init, h_rand_vec_init, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
         cout<<"Error copying h_rand_vec_init to device"<<endl;
     }
+
+    float* store_stream_res;
+    float* h_store_stream_res = new float[node_size*NUMSTRM];
+    thrust::fill(h_store_stream_res, h_store_stream_res+node_size*NUMSTRM, 0.0f);
+    if(!HandleCUDAError(cudaMalloc((void**)&store_stream_res, sizeof(float)*node_size*NUMSTRM))){
+        std::cout<<"Error allocating memory for store_stream_res"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(store_stream_res, h_store_stream_res, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
+        cout<<"Error copying h_store_stream_res to device"<<endl;
+    }
+    delete[] h_store_stream_res;
     float* rand_numbers;
     if (!HandleCUDAError(cudaMalloc((void**)&rand_numbers, sizeof(float) * edge_size*NUMSTRM))) {
         cout << "Error allocating memory for rand_numbers" << endl;
@@ -394,20 +403,20 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start);
-    for(int i = 0; i < NUMSTRM; i++){
-        //Initialize the random vector
-        float* rand_init_i = rand_init + i*num_walker;
-        float* rand_vec_init_i = rand_vec_init + i*node_size;
-        Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
-        if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-            cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
-        }
-    }
     for(int i = 0; i < epochs; i++){
         cout<<"Epoch "<<i<<endl;
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
         int while_count = 0;
         while_count=0;
+        for(int i = 0; i < NUMSTRM; i++){
+            //Initialize the random vector
+            float* rand_init_i = rand_init + i*num_walker;
+            float* rand_vec_init_i = rand_vec_init + i*node_size;
+            Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
+            if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
+            }
+        }
         while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
@@ -438,6 +447,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                     float* d_res_i = d_res + i*node_size;
                     float* d_vec_i = d_vec + i*node_size;
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
+                    float* store_stream_res_i = store_stream_res + i*node_size;
                     Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(d_res_i,d_vec_i, node_size);
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
@@ -457,19 +467,14 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                     sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size);
                     float temp = sum[i];
                     thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, rand_vec_init_i, [=] __device__ (float x) { return x/temp; });
+                    Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, store_stream_res_i, node_size);
+                    if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                        cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+                    }
                     // thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
                 }
             }
         }
-        // switch(epochs%NUMSTRM){
-        //     case 0:
-        //         thrust::transform(thrust::device, rand_vec_init+(NUMSTRM-1)*edge_size, rand_vec_init+(NUMSTRM)*edge_size, rand_vec_init, [damping_factor] __device__ (float x) { return x + damping_factor * x; });
-        //         break;
-        //     default:
-        //         thrust::transform(thrust::device, rand_vec_init+(epochs%NUMSTRM)*edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size+edge_size, rand_vec_init+(1+epochs%NUMSTRM)*edge_size, [damping_factor] __device__ (float x) { return x + damping_factor * x; });
-        //         break;
-            
-        // }
     }
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);

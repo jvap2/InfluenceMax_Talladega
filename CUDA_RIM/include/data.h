@@ -54,7 +54,10 @@
 #define WIKI_VOTE_DATA_MEASURE "../RIM_data/wiki-vote/meas.csv"
 #define ARVIX_DATA_MEASURE "../RIM_data/arvix/meas.csv"
 #define HOMO_DATA_MEASURE "../RIM_data/syn/meas.csv"
-
+#define HEPTH_DATA_MEASURE_2 "../RIM_data/HepTh/meas_2.csv"
+#define WIKI_VOTE_DATA_MEASURE_2 "../RIM_data/wiki-vote/meas_2.csv"
+#define ARVIX_DATA_MEASURE_2 "../RIM_data/arvix/meas_2.csv"
+#define HOMO_DATA_MEASURE_2 "../RIM_data/syn/meas_2.csv"
 
 using namespace std;
 
