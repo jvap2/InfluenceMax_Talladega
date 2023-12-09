@@ -8,6 +8,7 @@ import sys
 
 meas_1="../../RIM_data/wiki-vote/meas.csv"
 meas_2 = "../../RIM_data/wiki-vote/meas_2.csv"
+meas_3 = "../../RIM_data/wiki-vote/meas_3.csv"
 
 ver = int(sys.argv[1])
 
@@ -15,6 +16,8 @@ if ver == 1:
     f = meas_1
 elif ver == 2:
     f = meas_2
+elif ver == 3:
+    f = meas_3
 else:
     print("Wrong version number")
     sys.exit(1)
