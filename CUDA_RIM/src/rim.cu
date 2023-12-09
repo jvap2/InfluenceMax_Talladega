@@ -506,9 +506,9 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     thrust::sequence(thrust::device, rand_idx, rand_idx+node_size);
     //Take the sum of the vectors and then sort them
     for(int i = 1; i<NUMSTRM;i++){
-        thrust::transform(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_vec_init+i*node_size, rand_vec_init, thrust::plus<float>());
+        thrust::transform(thrust::device, store_stream_res, store_stream_res+node_size, store_stream_res+i*node_size, store_stream_res, thrust::plus<float>());
     }
-    thrust::sort_by_key(thrust::device, rand_vec_init, rand_vec_init+node_size, rand_idx, thrust::greater<float>());
+    thrust::sort_by_key(thrust::device, store_stream_res, store_stream_res+node_size, rand_idx, thrust::greater<float>());
     //Get the top k indexes
     if(!HandleCUDAError(cudaMemcpy(h_rand_idx, rand_idx, sizeof(unsigned int)*K, cudaMemcpyDeviceToHost))){
         cout<<"Error copying rand_idx to host"<<endl;
