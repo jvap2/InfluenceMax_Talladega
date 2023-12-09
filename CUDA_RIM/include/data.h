@@ -80,12 +80,14 @@ void Normalize_L2(float* h_x, unsigned int node_size);
 void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, string path);
 
 
-__host__ void Save_Data(string file, float time, float damping_factor, float threshold);
+__host__ void Save_Data(string file, float time, float damping_factor, float threshold,unsigned int epoch);
 
 
 //CUDA
 
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
+
+__host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
 
 __global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size);
 

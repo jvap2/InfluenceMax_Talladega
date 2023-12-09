@@ -31,9 +31,9 @@ lt_iterations = lt_model.iteration_bunch(lt_num_steps)
 print("Final Spread, LT",lt_iterations[-1]["node_count"])
 
 
-ic_num_steps = 100
+ic_num_steps = 50
 # Number of nodes in the seed set
-ic_seed_set_size = 30
+ic_seed_set_size = 100
 # Determine the seed set
 # Determine the model parameter
 ic_threshold = 0.5
@@ -62,7 +62,7 @@ vr = voterank(g, number_of_nodes=ic_seed_set_size)
 
 
 vr_lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=vr)
-lt_iterations = lt_model.iteration_bunch(lt_num_steps)
+lt_iterations = vr_lt_model.iteration_bunch(lt_num_steps)
 print("Final Spread VR, LT",lt_iterations[-1]["node_count"])
 # Run the model
 ic_model_2 = independent_cascade(graph=g, threshold=ic_threshold, seed_set=vr)
