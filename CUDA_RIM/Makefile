@@ -15,7 +15,7 @@ BIN := bin
 
 IMM: $(BIN)/IMM
 
-$(BIN)/IMM: $(OBJ)/main.o $(OBJ)/rim.o $(OBJ)/data.o $(OBJ)/err.o
+$(BIN)/IMM: $(OBJ)/main.o $(OBJ)/rim.o $(OBJ)/data.o $(OBJ)/err.o $(OBJ)/pr.o
 	$(NVCC) $(LINK_FLAGS) $(INC_FLAGS) $^ -o $@
 
 
@@ -27,6 +27,9 @@ $(OBJ)/main.o: $(SRC)/main.cpp
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/rim.o: $(SRC)/rim.cu 
+	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
+
+$(OBJ)/pr.o: $(SRC)/pr.cu
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/err.o: $(INC)/GPUErrors.cu

@@ -13,9 +13,8 @@
 
 int main(int argc, char** argv)
 {
-    //read in the data, for IC
     if(argc < 2){
-        cout << "Please specify the diffusion model" << endl;
+        cout << "Please specify the data set" << endl;
         exit(0);
     }
     else{
@@ -39,6 +38,8 @@ int main(int argc, char** argv)
                 RIM_rand_Ver1(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE);
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_2);
+            else if(strcmp(argv[2],"pr")==0)
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_PR);
             Export_Seed_Set_to_CSV(seed_set,K,HEPTH_SEED_PATH);
         }
         else if(strcmp(argv[1],"WK")==0){
@@ -61,6 +62,8 @@ int main(int argc, char** argv)
                 RIM_rand_Ver1(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE);
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_2);
+            else if(strcmp(argv[2],"pr")==0)
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_PR);
             Export_Seed_Set_to_CSV(seed_set,K,WIKI_VOTE_SEED_PATH);
         }
         else if(strcmp(argv[1],"AR")==0){
@@ -83,6 +86,8 @@ int main(int argc, char** argv)
                 RIM_rand_Ver1(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE);
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_2);
+            else if(strcmp(argv[2],"pr")==0)
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_PR);
             Export_Seed_Set_to_CSV(seed_set,K,ARVIX_SEED_PATH);
         }
         else if(strcmp(argv[1],"PLN")==0){
@@ -105,6 +110,8 @@ int main(int argc, char** argv)
                 RIM_rand_Ver1(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE);
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_2);
+            else if(strcmp(argv[2],"pr")==0)
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_PR);           
             Export_Seed_Set_to_CSV(seed_set,K,SEED_PATH);
         }
         else{

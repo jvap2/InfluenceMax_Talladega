@@ -182,16 +182,7 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
     cout<<"Converged in "<<iter_temp-max_iter<<" iterations"<<endl;
     cout<<"Tolerance: "<<tol_temp<<endl;
     *time=milliseconds;
-    unsigned int *d_indices;
 
-    // if(!HandleCUDAError(cudaMalloc((void**)&d_indices, node_size*sizeof(unsigned int)))){
-    //     cout<<"Error allocating memory for d_indices"<<endl;
-    // }
-    // thrust::sequence(thrust::device, d_indices, d_indices+node_size);
-    // thrust::stable_sort_by_key(thrust::device, d_pr_vector, d_pr_vector+node_size, d_indices, thrust::greater<float>());
-    // if(!HandleCUDAError(cudaMemcpy(h_indices, d_indices, node_size*sizeof(unsigned int), cudaMemcpyDeviceToHost))){
-    //     cout<<"Error copying d_indices to host"<<endl;
-    // }
     cout<<"PageRank finished"<<endl;
     if(!HandleCUDAError(cudaMemcpy(pr_vector, d_pr_vector, node_size*sizeof(float), cudaMemcpyDeviceToHost))){
         cout<<"Error copying pr_vector to host"<<endl;

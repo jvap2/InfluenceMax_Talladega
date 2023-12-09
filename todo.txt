@@ -15,3 +15,5 @@
 - Need to add to the python files to deal with the flow measurements
 
 - See what other influence algorithms networkx has at least
+
+- Take the values that are not zeroed out and pluck more random ones each iteration

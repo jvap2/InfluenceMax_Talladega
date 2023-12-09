@@ -1,9 +1,9 @@
 #!/bin/sh
 
-vers=2
+vers=3
 
 make clean
 make IMM
-./bin/IMM PLN two
+./bin/IMM PLN pr
 cd src
 python3 check_diff.py $vers
