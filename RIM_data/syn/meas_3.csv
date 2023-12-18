@@ -1,3 +1,2 @@
-streams,time(ms),damping_factor,threshold,epochs,K,percent_LT,percent_IC
-,,,,,,1.0,1.0
-12.0,68.9571,0.3,0.8,30.0,100.0,1.0,1.0
+streams,time(ms),damping_factor,threshold,epochs,K,percent_IC_CU,percent_LT_CU,time_cu_lt,time_cu_ic,l,eps,percent_LT,percent_IC
+12,75.6328,0.3,0.8,30,100,0.97475,0.02475,590607.44752,764645.331416,1.0,0.1,1.0,1.0

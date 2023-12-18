@@ -10,6 +10,7 @@ meas_2="../../RIM_data/HepTh/meas_2.csv"
 meas_3="../../RIM_data/HepTh/meas_3.csv"
 
 ver = int(sys.argv[1])
+k = int(sys.argv[2])
 
 if ver == 1:
     f = meas_1
@@ -49,7 +50,7 @@ print("Final Spread, LT",lt_iterations[-1]["node_count"])
 
 ic_num_steps = 50
 # Number of nodes in the seed set
-ic_seed_set_size = 100
+ic_seed_set_size = k
 # Determine the seed set
 # Determine the model parameter
 ic_threshold = 0.5
@@ -90,3 +91,29 @@ print("Final Spread, Voterank RIM, susceptible, infected and the recovered nodes
 vr_set = set(vr)
 seed_set = set(seeds)
 print("Intersection:",vr_set.intersection(seed_set))
+
+curip_seeds_lt = pd.read_csv("../../RIM_res/curip_hepth_LT_new.csv")
+curip_seeds_lt = curip_seeds_lt.loc[:,"Seed_Set"].to_numpy()
+## Run several simulations to evaluate the spread
+curip_seeds_ic = pd.read_csv("../../RIM_res/curip_hepth_IC_new.csv")
+curip_seeds_ic = curip_seeds_ic.loc[:,"Seed_Set"].to_numpy()
+## Run several simulations to evaluate the spread
+ic_model_curip = independent_cascade(graph=g, threshold=ic_threshold, seed_set=curip_seeds_ic)
+ic_iterations = ic_model_curip.iteration_bunch(ic_num_steps)
+spread_1 = []
+for iteration in ic_iterations:
+    spread_1.append(iteration['node_count'][1])
+print("Final Spread, Curip RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
+percent_ic_spread = (ic_iterations[-1]["node_count"][2]+ic_iterations[-1]["node_count"][1])/len(g.nodes())
+
+lt_model_curip = linear_threshold(graph=g, threshold=lt_threshold, seed_set=curip_seeds_lt)
+lt_iterations = lt_model_curip.iteration_bunch(lt_num_steps)
+percent_lt_spread = lt_iterations[-1]["node_count"][1]/len(g.nodes())
+print("Final Spread, Curip RIM, susceptible, infected and the recovered nodes ",lt_iterations[-1]["node_count"])
+
+
+exec_data = pd.read_csv(f)
+test_trial=exec_data.shape[0]
+exec_data.loc[test_trial-1, "percent_LT_CU"] = percent_lt_spread
+exec_data.loc[test_trial-1, "percent_IC_CU"] = percent_ic_spread
+exec_data.to_csv(f,index=False)

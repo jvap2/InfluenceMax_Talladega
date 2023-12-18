@@ -1,0 +1,3 @@
+[submodule "ripples"]
+	path = ripples
+	url = https://github.com/pnnl/ripples
