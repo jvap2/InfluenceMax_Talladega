@@ -115,8 +115,8 @@ if __name__ == "__main__":
 
     exec_data = pd.read_csv(f)
     test_trial=exec_data.shape[0]
-    exec_data.loc[test_trial-1, "percent_LT"] = percent_lt_spread
-    exec_data.loc[test_trial-1, "percent_IC"] = percent_ic_spread
+    exec_data.loc[test_trial-1, "percent_LT_RIMR"] = percent_lt_spread
+    exec_data.loc[test_trial-1, "percent_IC_RIMR"] = percent_ic_spread
     exec_data.to_csv(f,index=False)
 
 
@@ -158,8 +158,12 @@ if __name__ == "__main__":
     print("Final Spread, curip RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
 
     curip_lt_set = set(curip_lt_seeds)
+    curip_ic_set = set(curip_ic_seeds)
     seed_set = set(seeds)
-    print("Intersection:",curip_lt_set.intersection(seed_set))
+    print("Intersection LT:",curip_lt_set.intersection(seed_set))
+    print("Intersection IC:",curip_ic_set.intersection(seed_set))
+    lt_inter_len = len(curip_lt_set.intersection(seed_set))
+    ic_inter_len = len(curip_ic_set.intersection(seed_set))
 
 
     percent_curip_ic_spread = (ic_iterations[-1]["node_count"][2]+ic_iterations[-1]["node_count"][1])/len(g.nodes())
@@ -170,4 +174,6 @@ if __name__ == "__main__":
     test_trial=exec_data.shape[0]
     exec_data.loc[test_trial-1, "percent_LT_CU"] = percent_curip_lt_spread
     exec_data.loc[test_trial-1, "percent_IC_CU"] = percent_curip_ic_spread
+    exec_data.loc[test_trial-1, "percent_LT_over"] = lt_inter_len/k 
+    exec_data.loc[test_trial-1, "percent_IC_over"] = ic_inter_len/k
     exec_data.to_csv(f,index=False)
