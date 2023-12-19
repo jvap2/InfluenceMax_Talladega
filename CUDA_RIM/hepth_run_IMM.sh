@@ -2,7 +2,7 @@
 vers=3
 data_set=3
 seed_size=100
-ep=.1
+ep=.5
 
 make clean
 make IMM
