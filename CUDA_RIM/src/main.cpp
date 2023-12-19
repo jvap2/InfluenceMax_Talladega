@@ -40,6 +40,12 @@ int main(int argc, char** argv)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
                 RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_PR);
+            else if(strcmp(argv[3],"greedy")==0)
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_GREEDY);
+            else{
+                cout << "Please specify the version" << endl;
+                exit(0);
+            }
             Export_Seed_Set_to_CSV(seed_set,K,HEPTH_SEED_PATH);
         }
         else if(strcmp(argv[1],"WK")==0){
@@ -64,6 +70,12 @@ int main(int argc, char** argv)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
                 RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_PR);
+            else if(strcmp(argv[3],"greedy")==0)
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_GREEDY);
+            else{
+                cout << "Please specify the version" << endl;
+                exit(0);
+            }
             Export_Seed_Set_to_CSV(seed_set,K,WIKI_VOTE_SEED_PATH);
         }
         else if(strcmp(argv[1],"AR")==0){
@@ -88,6 +100,12 @@ int main(int argc, char** argv)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
                 RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_PR);
+            else if(strcmp(argv[3],"greedy")==0)
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_GREEDY);
+            else{
+                cout << "Please specify the version" << endl;
+                exit(0);
+            }
             Export_Seed_Set_to_CSV(seed_set,K,ARVIX_SEED_PATH);
         }
         else if(strcmp(argv[1],"PLN")==0){
@@ -103,6 +121,7 @@ int main(int argc, char** argv)
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
             genCSR(edge_list,csr,succ,no_nodes,no_edges);
+            cout<<"Generated CSR"<<endl;
             // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -111,7 +130,13 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_PR);           
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_PR); 
+            else if(strcmp(argv[3],"greedy")==0)
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_GREEDY);
+            else{
+                cout << "Please specify the version" << endl;
+                exit(0);
+            }        
             Export_Seed_Set_to_CSV(seed_set,K,SEED_PATH);
         }
         else{

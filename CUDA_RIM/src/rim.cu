@@ -874,6 +874,10 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     float* store_stream_res;
     float* h_store_stream_res = new float[node_size*NUMSTRM];
     thrust::fill(h_store_stream_res, h_store_stream_res+node_size*NUMSTRM, 0.0f);
+    float* rand_num_zero;
+    if(!HandleCUDAError(cudaMalloc((void**)&rand_num_zero, sizeof(unsigned int)*K*NUMSTRM))){
+        std::cout<<"Error allocating memory for rand_num_zero"<<endl;
+    }
     if(!HandleCUDAError(cudaMalloc((void**)&store_stream_res, sizeof(float)*node_size*NUMSTRM))){
         std::cout<<"Error allocating memory for store_stream_res"<<endl;
     }
@@ -886,15 +890,15 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
         std::cout << "Error allocating memory for rand_numbers" << endl;
     }
     printCudaMemoryUsage();
+    curandGenerator_t gen;
+    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start);
-    unsigned int seed_size = 0;
-    unsigned int epochs = 0;
-    while(seed_size<K){
-        epochs++;
-        std::cout<<"Epoch "<<epochs<<endl;
+    cout<<"Starting training"<<endl;
+    for(int i = 0; i < epochs; i++){
+        std::cout<<"Epoch "<<i<<endl;
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
         int while_count = 0;
         while_count=0;
@@ -902,22 +906,28 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
             thrust::copy(thrust::device.on(streams[i]), d_pr, d_pr+node_size, rand_vec_init+i*node_size);
             //Initialize the random vector
             float* rand_numbers_i = rand_numbers + i*NUMSTRM;
+            float* rand_num_zero_i = rand_num_zero + i*K;
             float* d_values_i = d_values + i*edge_size;
-            curandGenerator_t gen;
-            curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
             srand(time(0));
             int rand_seed = rand();
             curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
             curandGenerateUniform(gen, rand_numbers_i, edge_size);
-            curandDestroyGenerator(gen);
+            srand(time(0));
+            int num_cancel = static_cast<int>(K*ceil((1.0f*rand())/(RAND_MAX*1.0f)));
             thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
+            thrust::fill(thrust::device.on(streams[i]), rand_num_zero_i, rand_num_zero_i+K, 0);
+            curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
+            curandGenerateUniform(gen, rand_num_zero, num_cancel);
+            Zero_Rows<<<blocks_per_stream, TPB,0,streams[i]>>>(d_values_i,d_csc,d_succ,rand_num_zero_i,node_size,num_cancel);
+            if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                std::cout<<"Error synchronizing device at Zero_Rows for stream "<<i<<endl;
+            }
         }
         while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
                 if(tol[i] > threshold){
-                    float* rand_numbers_i = rand_numbers + i*NUMSTRM;
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
@@ -961,23 +971,8 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
                 }
             }
         }
-        for(int i = 0; i < NUMSTRM; i++){
-            thrust::device_vector<float> max_values(node_size);
-            thrust::device_vector<int> max_indices(node_size);
-            thrust::reduce_by_key(thrust::device.on(streams[i]), thrust::counting_iterator<int>(0), thrust::counting_iterator<int>(node_size), rand_vec_init + i * node_size, max_indices.begin(), max_values.begin(), thrust::equal_to<int>(), thrust::maximum<float>());
-
-            thrust::device_vector<int> unique_indices(max_indices);
-            auto new_end = thrust::unique(thrust::device.on(streams[i]), unique_indices.begin(), unique_indices.end());
-            unique_indices.resize(new_end - unique_indices.begin());
-
-            int num_unique_indices = unique_indices.size();
-            unsigned int* seed_set_i = seed_set + seed_size;
-            for(int j = 0; j < num_unique_indices; j++){
-                int max_index = unique_indices[j];
-                seed_set_i[j] = max_index;
-                seed_size++;
-
-            }
+        for(int i = 0; i<NUMSTRM;i++){
+            thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+(i+1)*edge_size, 1.0f);
         }
     }
     cudaEventRecord(stop);
@@ -1002,13 +997,36 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     if(!HandleCUDAError(cudaFree(d_values))){
         std::cout<<"Error freeing d_values"<<endl;
     }
-    
+    unsigned int* rand_idx;
+    unsigned int* h_rand_idx = new unsigned int[node_size];
+    thrust::fill(h_rand_idx, h_rand_idx+node_size, 0);
+    if(!HandleCUDAError(cudaMalloc((void**)&rand_idx, sizeof(unsigned int)*node_size))){
+        std::cout<<"Error allocating memory for rand_idx"<<endl;
+    }
+    thrust::sequence(thrust::device, rand_idx, rand_idx+node_size);
+    //Take the sum of the vectors and then sort them
+    for(int i = 1; i<NUMSTRM;i++){
+        thrust::transform(thrust::device, store_stream_res, store_stream_res+node_size, store_stream_res+i*node_size, store_stream_res, thrust::plus<float>());
+    }
+    thrust::sort_by_key(thrust::device, store_stream_res, store_stream_res+node_size, rand_idx, thrust::greater<float>());
+    //Get the top k indexes
+    if(!HandleCUDAError(cudaMemcpy(h_rand_idx, rand_idx, sizeof(unsigned int)*K, cudaMemcpyDeviceToHost))){
+        std::cout<<"Error copying rand_idx to host"<<endl;
+    }
+    for(int i = 0; i < K; i++){
+        seed_set[i] = h_rand_idx[i];
+    }
+    if(!HandleCUDAError(cudaFree(rand_idx))){
+        std::cout<<"Error freeing rand_idx"<<endl;
+    }
+    delete[] h_rand_idx;
 
     for(int i = 0; i<NUMSTRM;i++){
         if(!HandleCUDAError(cudaStreamDestroy(streams[i]))){
             std::cout<<"Error destroying stream number "<<i<<endl;
         }
     }
+    curandDestroyGenerator(gen);
     if(!HandleCUDAError(cudaFree(store_stream_res))){
         std::cout<<"Error freeing store_stream_res"<<endl;
     }
@@ -1024,7 +1042,7 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     delete[] sum;
     delete[] tol;
     delete[] values;
-
+    
 }
 
 __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge_list, unsigned int node_size, unsigned int edge_size){
@@ -1203,4 +1221,16 @@ __host__ void Verify(float* gpu_vec, float* cpu_vec, unsigned int size){
         }
     }
     std::cout<<"No errors found"<<endl;
+}
+
+__global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, float* idx, unsigned int node_size, unsigned int num_cancel){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    if(tid<num_cancel){
+        unsigned int int_idx = (unsigned int)(idx[tid]*node_size);
+        unsigned int start = csc[int_idx];
+        unsigned int end = csc[int_idx+1];
+        for(int i = start; i < end; i++){
+            values[i] = 0.0f;
+        }
+    }
 }
