@@ -156,7 +156,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
                     thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
-                    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
+                    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                     }
@@ -404,7 +404,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
-                    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
+                    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                     }
@@ -548,7 +548,6 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     thrust::fill(h_rand_vec_init, h_rand_vec_init+node_size*NUMSTRM, 0.0f);
     thrust::fill(pr_vector, pr_vector+node_size, 0.0f);
     unsigned int *pr_csc, *pr_succ;
-    genCSC()
     PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
     float* d_pr;
     if(!HandleCUDAError(cudaMalloc((void**)&d_pr, sizeof(float)*node_size))){
@@ -667,7 +666,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
-                    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
+                    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                     }
@@ -950,7 +949,7 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
-                    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
+                    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                     }
@@ -1147,7 +1146,7 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
         std::cout<<"Error synchronizing device"<<endl;
     }
     //Perform the first iteration of the algorithm
-    sparseCSRMat_Vec_Mult<<<blocks_per_stream, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
+    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB>>>(d_csc, d_succ, d_values, rand_vec_init, d_res, node_size);  
     if(!HandleCUDAError(cudaDeviceSynchronize())){
         std::cout<<"Error synchronizing device"<<endl;
     }
@@ -1188,13 +1187,14 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
 
 }
 
-__global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size){
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int node_size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
-        unsigned int start = csc[t];
-        unsigned int end = csc[t+1];
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
         float sum = 0.0f;
-        for(int i = start; i < end; i++){
+        for(IndexType i = start; i < end; i++){
             sum += values[i]*vec[succ[i]];
         }
         result[t] = sum;

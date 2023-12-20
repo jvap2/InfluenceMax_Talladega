@@ -34,19 +34,17 @@ __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* 
 }
 
 
-__global__ void Init_P_Sparse(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp){
+__global__ void Init_P_Sparse(float* weight_P,const int* src,const int* succ, unsigned int node_size, float* damp){
     unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx<node_size){
         //We need to find a node in the src
         //We will then iterate through the succ, and access the src[succ+1] to src[succ] to 
         // get the out degree
         unsigned int num_succ=src[idx+1]-src[idx];
-        unsigned int start = src[idx];
-        unsigned int end = src[idx+1];
         if(num_succ!=0){
-            for(unsigned int i=start; i<end; i++){
+            for(unsigned int i=src[idx]; i<src[idx+1]; i++){
                 unsigned int succ_node = succ[i];//Get the node number of the successor
-                weight_P[i]+=(1.0-*damp)/(1.0f*num_succ);
+                weight_P[i]=(1.0-*damp)/(1.0f*num_succ);
             }
         }
     }
@@ -215,11 +213,11 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
 
 
 
-__host__ void PageRank_Sparse(float* pr_vector, unsigned int* global_csc, unsigned int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time){
+__host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time){
     float tol_temp=100.0f;
     float* d_P;
-    unsigned int* d_global_src;
-    unsigned int* d_global_succ;
+    const int* d_global_src;
+    const int* d_global_succ;
     float* d_pr_vector;
     float* dr_pr_vector_temp;
     float* d_damp;
@@ -232,16 +230,16 @@ __host__ void PageRank_Sparse(float* pr_vector, unsigned int* global_csc, unsign
     if(!HandleCUDAError(cudaMalloc((void**)&d_P, edge_size*sizeof(float)))){
         cout<<"Error allocating memory for P"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_global_src, (node_size+1)*sizeof(unsigned int)))){
+    if(!HandleCUDAError(cudaMalloc((void**)&d_global_src, (node_size+1)*sizeof(int)))){
         cout<<"Error allocating memory for global_src"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_global_succ, edge_size*sizeof(unsigned int)))){
+    if(!HandleCUDAError(cudaMalloc((void**)&d_global_succ, edge_size*sizeof(int)))){
         cout<<"Error allocating memory for global_succ"<<endl;
     }
-    if(!HandleCUDAError(cudaMemcpy(d_global_src, global_csc, (node_size+1)*sizeof(unsigned int), cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpyToSymbol(d_global_src, global_csc, (node_size+1)*sizeof(int), cudaMemcpyHostToDevice))){
         cout<<"Error copying global_src to device"<<endl;
     }
-    if(!HandleCUDAError(cudaMemcpy(d_global_succ, global_succ, edge_size*sizeof(unsigned int), cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpyToSymbol(d_global_succ, global_succ, edge_size*sizeof(int), cudaMemcpyHostToDevice))){
         cout<<"Error copying global_succ to device"<<endl;
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_damp, sizeof(float)))){
@@ -251,5 +249,71 @@ __host__ void PageRank_Sparse(float* pr_vector, unsigned int* global_csc, unsign
         cout<<"Error copying damp to device"<<endl;
     }
     Init_P_Sparse<<<blocks_edge,tpb>>>(d_P, d_global_src, d_global_succ, node_size, d_damp);
+    //Now we need to take the transpose of the csr format of this using cusparse
+    cusparseHandle_t handle;
+    cusparseMatDescr_t descr;
+    if(!HandleCUSparseError(cusparseCreate(&handle))){
+        cout<<"Error creating cusparse handle"<<endl;
+    }
+    if(!HandleCUSparseError(cusparseCreateMatDescr(&descr))){
+        cout<<"Error creating cusparse matrix descriptor"<<endl;
+    }
+    if(!HandleCUSparseError(cusparseSetMatType(descr, CUSPARSE_MATRIX_TYPE_GENERAL))){
+        cout<<"Error setting cusparse matrix type"<<endl;
+    }
+    if(!HandleCUSparseError(cusparseSetMatIndexBase(descr, CUSPARSE_INDEX_BASE_ZERO))){
+        cout<<"Error setting cusparse matrix index base"<<endl;
+    }
+    int* d_csr_row_ptr;
+    int* d_csr_col_ind;
+    float* d_csr_val;
+    void *buffer = NULL;
+    size_t bufferSize = 0;
+    if(!HandleCUDAError(cudaMalloc((void**)&d_csr_row_ptr, (node_size+1)*sizeof(int)))){
+        cout<<"Error allocating memory for csr_row_ptr"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_csr_col_ind, edge_size*sizeof(int)))){
+        cout<<"Error allocating memory for csr_col_ind"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_csr_val, edge_size*sizeof(float)))){
+        cout<<"Error allocating memory for csr_val"<<endl;
+    }
+    if(!HandleCUSparseError(cusparseCsr2cscEx2_bufferSize(handle, node_size, node_size, edge_size, d_P, d_global_src, d_global_succ, d_csr_val, d_csr_col_ind, d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1,&bufferSize))){
+        cout<<"Error getting buffer size for csr2csc"<<endl;
+    }
 
+    if(!HandleCUSparseError(cusparseCsr2cscEx2(handle, node_size, node_size, edge_size, d_P, d_global_src, d_global_succ, d_csr_val, d_csr_col_ind, d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1,buffer))){
+        cout<<"Error converting csr to csc"<<endl;
+    }
+    //Now we need to get the transpose of the csr matrix
+    if(!HandleCUDAError(cudaFree(d_P))){
+        cout<<"Error freeing memory for P"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(const_cast<int*>(d_global_succ)))){
+        cout<<"Error freeing memory for global_succ"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(const_cast<int*>(d_global_src)))){
+        cout<<"Error freeing memory for global_src"<<endl;
+    }
+    //Now, we need to initialize the pr_vector and support vector
+    if(!HandleCUDAError(cudaMalloc((void**)&d_pr_vector, node_size*sizeof(float)))){
+        cout<<"Error allocating memory for pr_vector"<<endl;
+    }
+    Init_Pr<<<blocks_node,tpb>>>(d_pr_vector, node_size);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device with Initializing pr_vector"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&dr_pr_vector_temp, node_size*sizeof(float)))){
+        cout<<"Error allocating memory for dr_pr_vector_temp"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemset(dr_pr_vector_temp, 0, node_size*sizeof(float)))){
+        cout<<"Error setting dr_pr_vector_temp to 0"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_support_vect, node_size*sizeof(float)))){
+        cout<<"Error allocating memory for support vector"<<endl;
+    }
+    Init_Pr<<<blocks_node,tpb>>>(d_support_vect, node_size);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        cout<<"Error synchronizing device with Initializing support vector"<<endl;
+    }
 }
