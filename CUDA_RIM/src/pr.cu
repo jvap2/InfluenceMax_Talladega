@@ -14,18 +14,7 @@ __global__ void Init_P(float* P, unsigned int node_size, float* damp){
     }
 }
 
-// __global__ void Gen_P(float* weight_P,edge* edgelist, unsigned int* src, unsigned int node_size, float* damp){
-//     unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
-//     if(x < node_size){
-//         unsigned int start = edgelist[x].src;
-//         unsigned int end = edgelist[x].dst;
-//         unsigned int out = src[start+1]-src[start];
-//         if(out!=0){
-//             weight_P[end*node_size+start]+=(1.0-*damp)/(out*1.0);
-//         }
-//     }
 
-// }
 
 
 __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp){
@@ -39,6 +28,25 @@ __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* 
             for(unsigned int i=src[idx]; i<src[idx+1]; i++){
                 unsigned int succ_node = succ[i];//Get the node number of the successor
                 weight_P[succ_node*node_size+idx]+=(1.0-*damp)/(1.0f*num_succ);
+            }
+        }
+    }
+}
+
+
+__global__ void Init_P_Sparse(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp){
+    unsigned int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if(idx<node_size){
+        //We need to find a node in the src
+        //We will then iterate through the succ, and access the src[succ+1] to src[succ] to 
+        // get the out degree
+        unsigned int num_succ=src[idx+1]-src[idx];
+        unsigned int start = src[idx];
+        unsigned int end = src[idx+1];
+        if(num_succ!=0){
+            for(unsigned int i=start; i<end; i++){
+                unsigned int succ_node = succ[i];//Get the node number of the successor
+                weight_P[i]+=(1.0-*damp)/(1.0f*num_succ);
             }
         }
     }
@@ -70,10 +78,6 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
     dim3 Threads(tpb_2d, tpb_2d);
     dim3 Blocks(blocks_2d, blocks_2d);
     unsigned int blocks_edge = (edge_size+tpb-1)/tpb;
-    edge* d_edgelist;
-    if(!HandleCUDAError(cudaMalloc((void**)&d_edgelist, edge_size*sizeof(edge)))){
-        cout<<"Error allocating memory for edgelist"<<endl;
-    }
     if(!HandleCUDAError(cudaMalloc((void**)&d_P, node_size*node_size*sizeof(float)))){
         cout<<"Error allocating memory for P"<<endl;
     }
@@ -209,3 +213,43 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
 }
 
 
+
+
+__host__ void PageRank_Sparse(float* pr_vector, unsigned int* global_csc, unsigned int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time){
+    float tol_temp=100.0f;
+    float* d_P;
+    unsigned int* d_global_src;
+    unsigned int* d_global_succ;
+    float* d_pr_vector;
+    float* dr_pr_vector_temp;
+    float* d_damp;
+    float* d_support_vect;
+    float norm=0;
+    float norm_temp=0;
+    unsigned int tpb = 256;
+    unsigned int blocks_node = (node_size+tpb-1)/tpb;
+    unsigned int blocks_edge = (edge_size+tpb-1)/tpb;
+    if(!HandleCUDAError(cudaMalloc((void**)&d_P, edge_size*sizeof(float)))){
+        cout<<"Error allocating memory for P"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_global_src, (node_size+1)*sizeof(unsigned int)))){
+        cout<<"Error allocating memory for global_src"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_global_succ, edge_size*sizeof(unsigned int)))){
+        cout<<"Error allocating memory for global_succ"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(d_global_src, global_csc, (node_size+1)*sizeof(unsigned int), cudaMemcpyHostToDevice))){
+        cout<<"Error copying global_src to device"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(d_global_succ, global_succ, edge_size*sizeof(unsigned int), cudaMemcpyHostToDevice))){
+        cout<<"Error copying global_succ to device"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_damp, sizeof(float)))){
+        cout<<"Error allocating memory for damp"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(d_damp, &damp, sizeof(float), cudaMemcpyHostToDevice))){
+        cout<<"Error copying damp to device"<<endl;
+    }
+    Init_P_Sparse<<<blocks_edge,tpb>>>(d_P, d_global_src, d_global_succ, node_size, d_damp);
+
+}

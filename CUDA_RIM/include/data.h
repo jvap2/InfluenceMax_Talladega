@@ -31,7 +31,7 @@
 #include <thrust/logical.h>
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
-#include <thrust/random/uniform_int_distribution.h>
+#include <thrust/extrema.h>
 #include "GPUErrors.h"
 
 #define TPB 256
@@ -48,6 +48,9 @@
 #define WIKI_VOTE_PATH "../Graph_Data_Storage/wikivote.csv"
 #define WIKI_VOTE_DATA_PATH "../Graph_Data_Storage/wikivote_data.csv"
 #define WIKI_VOTE_SEED_PATH "../RIM_res/res_wiki.csv"
+#define EP_PATH "../Graph_Data_Storage/epinions.csv"
+#define EP_DATA_PATH "../Graph_Data_Storage/epinions_data.csv"
+#define EP_SEED_PATH "../RIM_res/res_ep.csv"
 #define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh.csv"
 #define HEPTH_DATA_PATH "../Graph_Data_Storage/ca-HepTh-data.csv"
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
@@ -55,18 +58,22 @@
 #define WIKI_VOTE_DATA_MEASURE "../RIM_data/wiki-vote/meas.csv"
 #define ARVIX_DATA_MEASURE "../RIM_data/arvix/meas.csv"
 #define HOMO_DATA_MEASURE "../RIM_data/syn/meas.csv"
+#define EP_DATA_MEASURE "../RIM_data/epinions/meas.csv"
 #define HEPTH_DATA_MEASURE_2 "../RIM_data/HepTh/meas_2.csv"
 #define WIKI_VOTE_DATA_MEASURE_2 "../RIM_data/wiki-vote/meas_2.csv"
 #define ARVIX_DATA_MEASURE_2 "../RIM_data/arvix/meas_2.csv"
 #define HOMO_DATA_MEASURE_2 "../RIM_data/syn/meas_2.csv"
+#define EP_DATA_MEASURE_2 "../RIM_data/epinions/meas_2.csv"
 #define HEPTH_DATA_MEASURE_PR "../RIM_data/HepTh/meas_3.csv"
 #define WIKI_VOTE_DATA_MEASURE_PR "../RIM_data/wiki-vote/meas_3.csv"
 #define ARVIX_DATA_MEASURE_PR "../RIM_data/arvix/meas_3.csv"
 #define HOMO_DATA_MEASURE_PR "../RIM_data/syn/meas_3.csv"
+#define EP_DATA_MEASURE_PR "../RIM_data/epinions/meas_3.csv"
 #define HEPTH_DATA_MEASURE_GREEDY "../RIM_data/HepTh/meas_4.csv"
 #define WIKI_VOTE_DATA_MEASURE_GREEDY "../RIM_data/wiki-vote/meas_4.csv"
 #define ARVIX_DATA_MEASURE_GREEDY "../RIM_data/arvix/meas_4.csv"
 #define HOMO_DATA_MEASURE_GREEDY "../RIM_data/syn/meas_4.csv"
+#define EP_DATA_MEASURE_GREEDY "../RIM_data/epinions/meas_4.csv"
 
 using namespace std;
 
@@ -101,7 +108,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
 
 __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
 
-__host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
+__host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, edge* edge_list, string file);
 
 __global__ void sparseCSRMat_Vec_Mult(unsigned int* csc, unsigned int* succ, float* values, float* vec, float* result, unsigned int node_size);
 
@@ -123,4 +130,4 @@ __global__ void Init_P(float* P, unsigned int node_size, float* damp);
 
 __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
 
-__global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, float* idx, unsigned int node_size, unsigned int num_cancel);
+__global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);

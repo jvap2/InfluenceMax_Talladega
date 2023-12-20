@@ -1,6 +1,6 @@
 #!/bin/sh
 
-vers=4
+vers=3
 data_set=1
 seed_size=100
 ep=.5
