@@ -213,11 +213,11 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
 
 
 
-__host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time){
+__host__ void PageRank_Sparse(float* pr_vector, int* global_csc, int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time){
     float tol_temp=100.0f;
     float* d_P;
-    const int* d_global_src;
-    const int* d_global_succ;
+    int* d_global_src;
+    int* d_global_succ;
     float* d_pr_vector;
     float* dr_pr_vector_temp;
     float* d_damp;
@@ -236,10 +236,10 @@ __host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int
     if(!HandleCUDAError(cudaMalloc((void**)&d_global_succ, edge_size*sizeof(int)))){
         cout<<"Error allocating memory for global_succ"<<endl;
     }
-    if(!HandleCUDAError(cudaMemcpyToSymbol(d_global_src, global_csc, (node_size+1)*sizeof(int), cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpy(d_global_src, global_csc, (node_size+1)*sizeof(int), cudaMemcpyHostToDevice))){
         cout<<"Error copying global_src to device"<<endl;
     }
-    if(!HandleCUDAError(cudaMemcpyToSymbol(d_global_succ, global_succ, edge_size*sizeof(int), cudaMemcpyHostToDevice))){
+    if(!HandleCUDAError(cudaMemcpy(d_global_succ, global_succ, edge_size*sizeof(int), cudaMemcpyHostToDevice))){
         cout<<"Error copying global_succ to device"<<endl;
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_damp, sizeof(float)))){
@@ -281,7 +281,9 @@ __host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int
     if(!HandleCUSparseError(cusparseCsr2cscEx2_bufferSize(handle, node_size, node_size, edge_size, d_P, d_global_src, d_global_succ, d_csr_val, d_csr_col_ind, d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1,&bufferSize))){
         cout<<"Error getting buffer size for csr2csc"<<endl;
     }
-
+    if(!HandleCUDAError(cudaMalloc(&buffer, bufferSize))){
+        cout<<"Error allocating memory for buffer"<<endl;
+    }
     if(!HandleCUSparseError(cusparseCsr2cscEx2(handle, node_size, node_size, edge_size, d_P, d_global_src, d_global_succ, d_csr_val, d_csr_col_ind, d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1,buffer))){
         cout<<"Error converting csr to csc"<<endl;
     }
@@ -299,10 +301,7 @@ __host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int
     if(!HandleCUDAError(cudaMalloc((void**)&d_pr_vector, node_size*sizeof(float)))){
         cout<<"Error allocating memory for pr_vector"<<endl;
     }
-    Init_Pr<<<blocks_node,tpb>>>(d_pr_vector, node_size);
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device with Initializing pr_vector"<<endl;
-    }
+    thrust::fill(thrust::device, d_pr_vector, d_pr_vector+node_size, 1.0f/node_size);
     if(!HandleCUDAError(cudaMalloc((void**)&dr_pr_vector_temp, node_size*sizeof(float)))){
         cout<<"Error allocating memory for dr_pr_vector_temp"<<endl;
     }
@@ -312,8 +311,75 @@ __host__ void PageRank_Sparse(float* pr_vector, const int* global_csc, const int
     if(!HandleCUDAError(cudaMalloc((void**)&d_support_vect, node_size*sizeof(float)))){
         cout<<"Error allocating memory for support vector"<<endl;
     }
-    Init_Pr<<<blocks_node,tpb>>>(d_support_vect, node_size);
-    if(!HandleCUDAError(cudaDeviceSynchronize())){
-        cout<<"Error synchronizing device with Initializing support vector"<<endl;
+    thrust::fill(thrust::device, d_support_vect, d_support_vect+node_size, 1.0f/node_size);
+    cout<<"Performing PageRank"<<endl;
+    unsigned int iter_temp=max_iter;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
+    float l_2_pr=0;
+    float l_2_pr_temp=0;
+    float sum=0;
+    float old_tol=10;
+    while(max_iter>0 && tol_temp>tol){
+        sparseCSRMat_Vec_Mult<int><<<blocks_node,tpb>>>(d_csr_row_ptr, d_csr_col_ind, d_csr_val, d_pr_vector, dr_pr_vector_temp, node_size);
+        if(!HandleCUDAError(cudaDeviceSynchronize())){
+            cout<<"Error synchronizing device with sparse matrix vector multiplication"<<endl;
+        }
+        Float_VectAdd<<<blocks_node,tpb>>>(dr_pr_vector_temp, d_support_vect, node_size);
+        if(!HandleCUDAError(cudaDeviceSynchronize())){
+            cout<<"Error synchronizing device with vector addition"<<endl;
+        }
+        //Use thrust to normalize the pr_vector
+        // l_2_pr = thrust::transform_reduce(thrust::device, d_pr_vector, d_pr_vector + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+        // l_2_pr = sqrt(l_2_pr);
+
+        l_2_pr_temp = thrust::transform_reduce(thrust::device, dr_pr_vector_temp, dr_pr_vector_temp + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+        l_2_pr_temp = sqrt(l_2_pr_temp);
+
+        tol_temp = abs(old_tol-l_2_pr_temp);
+        old_tol=l_2_pr_temp;
+        thrust::copy(thrust::device, dr_pr_vector_temp, dr_pr_vector_temp+node_size, d_pr_vector);
+        thrust::fill(thrust::device, dr_pr_vector_temp, dr_pr_vector_temp+node_size, 0.0f);
+
+
+        sum = thrust::reduce(thrust::device, d_pr_vector, d_pr_vector+node_size);
+        float temp = sum;
+        thrust::transform(thrust::device, d_pr_vector, d_pr_vector+node_size, d_pr_vector, [=] __device__ (float x) { return x/temp; });
+        max_iter--;
     }
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    *time=milliseconds;
+    if(!HandleCUDAError(cudaFree(d_csr_row_ptr))){
+        cout<<"Error freeing memory for csr_row_ptr"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(d_csr_col_ind))){
+        cout<<"Error freeing memory for csr_col_ind"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(d_csr_val))){
+        cout<<"Error freeing memory for csr_val"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(pr_vector, d_pr_vector, node_size*sizeof(float), cudaMemcpyDeviceToHost))){
+        cout<<"Error copying pr_vector to host"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(d_pr_vector))){
+        cout<<"Error freeing memory for pr_vector"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(dr_pr_vector_temp))){
+        cout<<"Error freeing memory for dr_pr_vector_temp"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(d_support_vect))){
+        cout<<"Error freeing memory for support vector"<<endl;
+    }
+    if(!HandleCUDAError(cudaFree(d_damp))){
+        cout<<"Error freeing memory for damp"<<endl;
+    }
+    if(!HandleCUSparseError(cusparseDestroy(handle))){
+        cout<<"Error destroying cusparse handle"<<endl;
+    }
+
 }

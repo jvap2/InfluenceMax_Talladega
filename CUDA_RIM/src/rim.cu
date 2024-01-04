@@ -175,10 +175,10 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
                     }
                     //Need to normalize the vector using thrust library
 
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device.on(streams[i]), d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
 
-                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
 
                     tol[i] = abs(l2_norm_d_res[i]-l2_norm_rand_vec_init[i]);
@@ -367,6 +367,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start);
+    float tol_thresh=1e-6;
     for(int i = 0; i < epochs; i++){
         std::cout<<"Epoch "<<i<<endl;
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
@@ -396,7 +397,8 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
             curandDestroyGenerator(gen);
             thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
         }
-        while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
+        bool check = true;
+        while(check && while_count < 1000){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
@@ -423,10 +425,10 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                     }
                     //Need to normalize the vector using thrust library
 
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device.on(streams[i]), d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
 
-                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
 
                     tol[i] = abs(l2_norm_d_res[i]-l2_norm_rand_vec_init[i]);
@@ -441,6 +443,12 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                         std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
                     }
                     // thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
+                }
+            }
+            check = false;
+            for(int i=0;i<NUMSTRM;i++){
+                if(tol[i] > tol_thresh){
+                    check = true;
                 }
             }
         }
@@ -521,8 +529,8 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
 
 
 __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, edge* edge_list, string file){
-    float threshold = .8;
-    float tol_thresh = 1e-6;
+    float threshold = .3;
+    float tol_thresh = 1e-4;
     float damping_factor =.3;
     cudaDeviceProp prop;
     int device;
@@ -547,7 +555,12 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     *pr_time = 0.0f;
     thrust::fill(h_rand_vec_init, h_rand_vec_init+node_size*NUMSTRM, 0.0f);
     thrust::fill(pr_vector, pr_vector+node_size, 0.0f);
-    unsigned int *pr_csc, *pr_succ;
+    int *pr_csc, *pr_succ;
+    pr_csc = new int[node_size+1];
+    pr_succ = new int[edge_size];
+    thrust::copy(csc,csc+node_size+1,pr_csc);
+    thrust::copy(succ,succ+edge_size,pr_succ);
+    // PageRank_Sparse(pr_vector,pr_csc,pr_succ,.15f,node_size,edge_size,100,1e-6,pr_time);
     PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
     float* d_pr;
     if(!HandleCUDAError(cudaMalloc((void**)&d_pr, sizeof(float)*node_size))){
@@ -639,10 +652,9 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     cudaEventRecord(start);
     for(int i = 0; i < epochs; i++){
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
-        int while_count = 0;
-        while_count=0;
         for(int i =0; i<NUMSTRM;i++){
-            thrust::copy(thrust::device.on(streams[i]), d_pr, d_pr+node_size, rand_vec_init+i*node_size);
+            float* rand_vec_init_i = rand_vec_init + i*node_size;
+            thrust::copy(thrust::device.on(streams[i]), d_pr, d_pr+node_size, rand_vec_init_i);
             //Initialize the random vector
             float* rand_numbers_i = rand_numbers + i*NUMSTRM;
             float* d_values_i = d_values + i*edge_size;
@@ -655,26 +667,26 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
             curandDestroyGenerator(gen);
             thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
         }
-        while_count=0;
+        int while_count = 0;
         bool check = true;
         while(check && while_count < 1000){
             while_count++;
-            for(int i = 0; i < NUMSTRM; i++){
+           for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
                 if(tol[i] > threshold){
-                    float* rand_numbers_i = rand_numbers + i*NUMSTRM;
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
                     float* d_res_i = d_res + i*node_size;
                     float* d_values_i = d_values + i*edge_size;
                     sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
+                        exit(1);
                     }
                 }
             }
             for(int i = 0; i < NUMSTRM; i++){
                 // Add 1/n to the vector
-                if(tol[i] > threshold){
+                if(tol[i] > tol_thresh){
                     float* d_res_i = d_res + i*node_size;
                     float* d_vec_i = d_vec + i*node_size;
                     float* rand_vec_init_i = rand_vec_init + i*node_size;
@@ -682,13 +694,14 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
                     Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(d_res_i,d_vec_i, node_size);
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+                        exit(1);
                     }
                     //Need to normalize the vector using thrust library
 
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device.on(streams[i]), d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
 
-                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
 
                     tol[i] = abs(l2_norm_d_res[i]-l2_norm_rand_vec_init[i]);
@@ -701,6 +714,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
                     Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(store_stream_res_i,rand_vec_init, node_size);
                     if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                         std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+                        exit(1);
                     }
                     // thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
                 }
@@ -785,7 +799,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
 }
 
 __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file){
-    float threshold = .5;
+    float threshold = .3;
     float damping_factor =.3;
     cudaDeviceProp prop;
     int device;
@@ -912,6 +926,7 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     cudaEventCreate(&stop);
     cudaEventRecord(start);
     curandGenerator_t gen;
+    float tol_thresh=1e-4;
     while(fill_count < K){
         std::cout<<"Epoch "<<epoch<<endl;
         epoch++;
@@ -933,14 +948,18 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
 
             float* rand_numbers_i = rand_numbers + i*NUMSTRM;
             float* d_values_i = d_values + i*edge_size;
+            curandGenerator_t gen;
             curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
             srand(time(0));
             int rand_seed = rand();
             curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
             curandGenerateUniform(gen, rand_numbers_i, edge_size);
+            curandDestroyGenerator(gen);
             thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
         }
-        while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
+        while_count = 0;
+        bool check = true;
+        while(check && while_count < 1000){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
@@ -968,10 +987,10 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
                     }
                     //Need to normalize the vector using thrust library
 
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device, d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device.on(streams[i]), d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
 
-                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device, rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
+                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
                     l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
 
                     tol[i] = abs(l2_norm_d_res[i]-l2_norm_rand_vec_init[i]);
@@ -981,6 +1000,12 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
                     sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size);
                     float temp = sum[i];
                     thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, rand_vec_init_i, [=] __device__ (float x) { return x/temp; });
+                }
+            }
+            check = false;
+            for(int i=0;i<NUMSTRM;i++){
+                if(tol[i] > tol_thresh){
+                    check = true;
                 }
             }
         }
@@ -993,7 +1018,6 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
             unsigned int index = iter - rand_vec_init_i;
             //check if index is already in d_seed_set
             unsigned int* iter2 = thrust::find(thrust::device.on(streams[i]), d_seed_set, d_seed_set+K, index);
-            cout<<"index: "<<index<<endl;
             if(iter2 == d_seed_set+K){
                 //index is not in d_seed_set
                 thrust::fill(thrust::device.on(streams[i]), d_seed_set+fill_count, d_seed_set+fill_count+1, index);
@@ -1187,19 +1211,6 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
 
 }
 
-template <typename IndexType>
-__global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int node_size){
-    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
-    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
-        IndexType start = csc[t];
-        IndexType end = csc[t+1];
-        float sum = 0.0f;
-        for(IndexType i = start; i < end; i++){
-            sum += values[i]*vec[succ[i]];
-        }
-        result[t] = sum;
-    }
-}
 
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
@@ -1241,6 +1252,17 @@ __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, 
         unsigned int end = csc[int_idx+1];
         for(int i = start; i < end; i++){
             values[i] = 0.0f;
+        }
+    }
+}
+
+__host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_size){
+    for(int i = 0; i<node_size;i++){
+        if(abs(sparse_vec[i]- full_vec[i])>=1e-6){
+            std::cout<<"Error at index "<<i<<endl;
+            std::cout<<"Sparse: "<<sparse_vec[i]<<endl;
+            std::cout<<"Full: "<<full_vec[i]<<endl;
+            return;
         }
     }
 }

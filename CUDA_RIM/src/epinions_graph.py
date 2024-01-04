@@ -41,11 +41,13 @@ if __name__ == "__main__":
     no_nodes = df_info.loc[:,"No. Nodes"].to_numpy()
     no_nodes = no_nodes[0]
     print(no_nodes)
-    adj_mat = np.zeros(shape=(no_nodes,no_nodes))
-    for s,d in zip(src,dst):
-        adj_mat[s][d]=1
+    File = "../../Graph_Data_Storage/soc-Epinions1.txt"
 
-    g = nx.from_numpy_array(adj_mat, create_using=nx.DiGraph())
+    g = nx.read_edgelist(
+        File,
+        create_using=nx.DiGraph(),
+        nodetype=int
+    )
     seed_set = pd.read_csv("../../RIM_res/res_ep.csv")
     seeds = seed_set.loc[:,"Seed_Set"].to_numpy()
     print("Seeds:",seeds)

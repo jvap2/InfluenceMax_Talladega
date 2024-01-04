@@ -17,3 +17,5 @@
 - See what other influence algorithms networkx has at least
 
 - Take the values that are not zeroed out and pluck more random ones each iteration
+
+-arxiv is messing up with matrix mult for some reason, it is due to the new pr algorithm
