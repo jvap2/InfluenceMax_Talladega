@@ -386,7 +386,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
                 std::cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
             }
 
-            float* rand_numbers_i = rand_numbers + i*NUMSTRM;
+            float* rand_numbers_i = rand_numbers + i*edge_size;
             float* d_values_i = d_values + i*edge_size;
             curandGenerator_t gen;
             curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
@@ -656,7 +656,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
             float* rand_vec_init_i = rand_vec_init + i*node_size;
             thrust::copy(thrust::device.on(streams[i]), d_pr, d_pr+node_size, rand_vec_init_i);
             //Initialize the random vector
-            float* rand_numbers_i = rand_numbers + i*NUMSTRM;
+            float* rand_numbers_i = rand_numbers + i*edge_size;
             float* d_values_i = d_values + i*edge_size;
             curandGenerator_t gen;
             curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
@@ -716,7 +716,6 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
                         std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
                         exit(1);
                     }
-                    // thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
                 }
             }
             check = false;

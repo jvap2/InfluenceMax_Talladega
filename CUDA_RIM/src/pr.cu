@@ -67,7 +67,7 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
     float* d_pr_vector;
     float* dr_pr_vector_temp;
     float* d_damp;
-    float norm=0;
+    float norm=100;
     float norm_temp=0;
     unsigned int tpb = 256;
     unsigned int blocks = (node_size+tpb-1)/tpb;
@@ -171,9 +171,14 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
     while(max_iter>0 && tol_temp>tol){
         cublasSgemv_v2(handle, CUBLAS_OP_T, node_size, node_size, &alpha, d_P, node_size, d_pr_vector, 1, &beta, dr_pr_vector_temp, 1);
         cublasSnrm2_v2(handle, node_size, dr_pr_vector_temp, 1, &norm_temp);
-        cublasSnrm2_v2(handle, node_size, d_pr_vector, 1, &norm);
         tol_temp = fabsf(norm_temp-norm);
+        norm = norm_temp;
         cublasScopy_v2(handle, node_size, dr_pr_vector_temp, 1, d_pr_vector, 1);
+        // Calculate the sum of all elements in d_pr_vector
+        float sum = 0.0f;
+        cublasSasum_v2(handle, node_size, d_pr_vector, 1, &sum);
+        // Normalize d_pr_vector
+        thrust::transform(thrust::device, d_pr_vector, d_pr_vector+node_size, d_pr_vector, [=] __device__ (float x) { return x/sum; });
         max_iter--;
     }
     cudaEventRecord(stop);
@@ -284,7 +289,8 @@ __host__ void PageRank_Sparse(float* pr_vector, int* global_csc, int* global_suc
     if(!HandleCUDAError(cudaMalloc(&buffer, bufferSize))){
         cout<<"Error allocating memory for buffer"<<endl;
     }
-    if(!HandleCUSparseError(cusparseCsr2cscEx2(handle, node_size, node_size, edge_size, d_P, d_global_src, d_global_succ, d_csr_val, d_csr_col_ind, d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO, CUSPARSE_CSR2CSC_ALG1,buffer))){
+    cout<<"Buffer size: "<<bufferSize<<endl;
+    if(!HandleCUSparseError(cusparseCsr2cscEx2(handle, node_size,node_size,edge_size,d_P,d_global_src,d_global_succ,d_csr_val,d_csr_col_ind,d_csr_row_ptr,CUDA_R_32F,CUSPARSE_ACTION_NUMERIC,CUSPARSE_INDEX_BASE_ZERO,CUSPARSE_CSR2CSC_ALG1,buffer))){
         cout<<"Error converting csr to csc"<<endl;
     }
     //Now we need to get the transpose of the csr matrix
@@ -311,7 +317,8 @@ __host__ void PageRank_Sparse(float* pr_vector, int* global_csc, int* global_suc
     if(!HandleCUDAError(cudaMalloc((void**)&d_support_vect, node_size*sizeof(float)))){
         cout<<"Error allocating memory for support vector"<<endl;
     }
-    thrust::fill(thrust::device, d_support_vect, d_support_vect+node_size, 1.0f/node_size);
+    thrust::fill(thrust::device, d_support_vect, d_support_vect+node_size, damp/node_size);
+    thrust::transform(thrust::device, d_csr_val, d_csr_val+edge_size, d_csr_val, [=] __device__ (float x) { return (1.0-damp)*x; });
     cout<<"Performing PageRank"<<endl;
     unsigned int iter_temp=max_iter;
     cudaEvent_t start, stop;
@@ -331,9 +338,7 @@ __host__ void PageRank_Sparse(float* pr_vector, int* global_csc, int* global_suc
         if(!HandleCUDAError(cudaDeviceSynchronize())){
             cout<<"Error synchronizing device with vector addition"<<endl;
         }
-        //Use thrust to normalize the pr_vector
-        // l_2_pr = thrust::transform_reduce(thrust::device, d_pr_vector, d_pr_vector + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
-        // l_2_pr = sqrt(l_2_pr);
+
 
         l_2_pr_temp = thrust::transform_reduce(thrust::device, dr_pr_vector_temp, dr_pr_vector_temp + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
         l_2_pr_temp = sqrt(l_2_pr_temp);

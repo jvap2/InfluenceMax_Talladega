@@ -3,9 +3,9 @@ CC = $(shell nvidia-smi --query-gpu=compute_cap --format=csv,noheader|head -n 1)
 NVCC := nvcc
 
 NVCC_FLAGS := --extended-lambda -Xcompiler -O3 -rdc=true -gencode arch=compute_89,code=sm_89
-NVCC_FLAGS_DEBUG := --extended-lambda -g -G -Xcompiler -Wall -rdc=true -gencode arch=compute_89,code=sm_89
+# NVCC_FLAGS := --extended-lambda -g -G -Xcompiler -Wall -rdc=true -gencode arch=compute_89,code=sm_89
 LINK_FLAGS := -arch=sm_89  
-INC_FLAGS := -lcudadevrt -lcurand -lcusparse -lcublas 
+INC_FLAGS := -lcudadevrt -lcurand -lcusparse -lcublas -lnvToolsExt
 # C_FLAGS := -std=c++11 
 
 INC := include

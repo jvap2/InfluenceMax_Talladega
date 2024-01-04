@@ -87,19 +87,7 @@ void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int
 }
 
 
-void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int node_size, unsigned int edge_size){
-    for(int i=0; i<edge_size;i++){
-        src[edge_list[i].src]++;
-        succ[i]=edge_list[i].dst;
-    }
-    //Now, we need to prefix sum the src_ptr
-    unsigned int* src_temp = new unsigned int[node_size+1]{0};
-    for(int i=1; i<=node_size;i++){
-        src_temp[i]=src_temp[i-1]+src[i-1];
-    }
-    copy(src_temp, src_temp+node_size+1, src);
-    delete[] src_temp;
-}
+
 
 
 void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int edge_size){

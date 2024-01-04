@@ -74,6 +74,12 @@
 #define ARVIX_DATA_MEASURE_GREEDY "../RIM_data/arvix/meas_4.csv"
 #define HOMO_DATA_MEASURE_GREEDY "../RIM_data/syn/meas_4.csv"
 #define EP_DATA_MEASURE_GREEDY "../RIM_data/epinions/meas_4.csv"
+#define HEPTH_PR "../Graph_Data_Storage/hepth_pr.csv"
+#define WIKI_VOTE_PR "../Graph_Data_Storage/wikivote_pr.csv"
+#define ARVIX_PR "../Graph_Data_Storage/arxiv_pr.csv"
+#define HOMO_PR "../Graph_Data_Storage/homo_pr.csv"
+#define EP_PR "../Graph_Data_Storage/epinions_pr.csv"
+
 
 using namespace std;
 
@@ -88,7 +94,21 @@ void get_graph_info(string path, unsigned int* nodes, unsigned int* edges);
 
 void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
 
-void genCSR(edge* edge_list, unsigned int* src, unsigned int* succ, unsigned int node_size, unsigned int edge_size);
+
+template <typename idx_t>
+void genCSR(edge* edge_list, idx_t* src, idx_t* succ, unsigned int node_size, unsigned int edge_size){
+    for(int i=0; i<edge_size;i++){
+        src[edge_list[i].src]++;
+        succ[i]=edge_list[i].dst;
+    }
+    //Now, we need to prefix sum the src_ptr
+    idx_t* src_temp = new idx_t[node_size+1]{0};
+    for(int i=1; i<=node_size;i++){
+        src_temp[i]=src_temp[i-1]+src[i-1];
+    }
+    copy(src_temp, src_temp+node_size+1, src);
+    delete[] src_temp;
+}
 
 void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int edge_size);
 
