@@ -218,7 +218,7 @@ int main(int argc, char** argv)
             time_1[0]=0.0f;
             time_2[0]=0.0f;
             PageRank(pr_full, csr,succ, .15f, no_nodes, no_edges, 100, 1e-6, time_1);
-            PageRank_Sparse(pr_vector,pr_csc,pr_succ,.15f,no_nodes,no_edges, 100, 1e-6,time_2,ARVIX_PR);
+            PageRank_Sparse(pr_vector,.15f,no_nodes,no_edges, 100, 1e-6,time_2,ARVIX_PR);
             Verify_Pr(pr_full,pr_vector,no_nodes);
             cout<<"Generated CSR"<<endl;
             // unsigned int* seed_set = new unsigned int[no_nodes];

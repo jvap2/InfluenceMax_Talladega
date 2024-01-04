@@ -131,4 +131,16 @@ exec_data.loc[test_trial-1, "percent_LT_CU"] = percent_curip_lt_spread
 exec_data.loc[test_trial-1, "percent_IC_CU"] = percent_curip_ic_spread
 exec_data.loc[test_trial-1, "percent_LT_over"] = len_lt/k
 exec_data.loc[test_trial-1, "percent_IC_over"] = len_ic/k
+
+time_RIM = exec_data.loc[test_trial-1, "time(ms)"]
+
+time_IMM_IC = exec_data.loc[test_trial-1, "time_cu_ic"]
+
+time_IMM_LT = exec_data.loc[test_trial-1, "time_cu_lt"]
+
+speedup_LT = time_RIM/time_IMM_LT
+speedup_IC = time_RIM/time_IMM_IC
+
+exec_data.loc[test_trial-1, "speedup_LT"] = speedup_LT
+exec_data.loc[test_trial-1, "speedup_IC"] = speedup_IC
 exec_data.to_csv(f,index=False)

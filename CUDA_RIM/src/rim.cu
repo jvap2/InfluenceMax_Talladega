@@ -560,8 +560,8 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     pr_succ = new int[edge_size];
     thrust::copy(csc,csc+node_size+1,pr_csc);
     thrust::copy(succ,succ+edge_size,pr_succ);
-    // PageRank_Sparse(pr_vector,pr_csc,pr_succ,.15f,node_size,edge_size,100,1e-6,pr_time);
-    PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
+    // PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
+    PageRank_Sparse(pr_vector,.15f,node_size,edge_size,100,1e-6,pr_time,pr_file);
     float* d_pr;
     if(!HandleCUDAError(cudaMalloc((void**)&d_pr, sizeof(float)*node_size))){
         std::cout<<"Error allocating memory for d_pr"<<endl;
@@ -824,7 +824,8 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     *pr_time = 0.0f;
     thrust::fill(h_rand_vec_init, h_rand_vec_init+node_size*NUMSTRM, 0.0f);
     thrust::fill(pr_vector, pr_vector+node_size, 0.0f);
-    PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
+    // PageRank(pr_vector,csc,succ,.15f,node_size,edge_size,100,1e-6,pr_time);
+    PageRank_Sparse(pr_vector,.15f,node_size,edge_size,100,1e-6,pr_time,pr_file);
     float* d_pr;
     if(!HandleCUDAError(cudaMalloc((void**)&d_pr, sizeof(float)*node_size))){
         std::cout<<"Error allocating memory for d_pr"<<endl;

@@ -239,7 +239,10 @@ __host__ void PageRank_Sparse(float* pr_vector, float damp, unsigned int node_si
     unsigned int* h_csr_row_ptr;
     unsigned int* h_csr_col_ind;
     float* h_csr_val;
-
+    h_csr_col_ind = new unsigned int[edge_size];
+    h_csr_val = new float[edge_size];
+    h_csr_row_ptr = new unsigned int[node_size+1];
+    thrust::fill(thrust::host, h_csr_row_ptr, h_csr_row_ptr+node_size+1, 0);
     Gen_Pr_Sprs(h_csr_row_ptr, h_csr_col_ind, h_csr_val, node_size, edge_size, damp, pr_file);
     unsigned int* d_csr_row_ptr;
     unsigned int* d_csr_col_ind;
