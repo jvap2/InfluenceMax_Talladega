@@ -39,9 +39,9 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,HEPTH_DATA_MEASURE_PR);
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,HEPTH_DATA_MEASURE_PR,HEPTH_PR);
             else if(strcmp(argv[2],"greedy")==0)
-                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_GREEDY);
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_GREEDY,HEPTH_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -73,9 +73,9 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,WIKI_VOTE_DATA_MEASURE_PR);
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,WIKI_VOTE_DATA_MEASURE_PR, WIKI_VOTE_PR);
             else if(strcmp(argv[2],"greedy")==0)
-                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_GREEDY);
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_GREEDY,WIKI_VOTE_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -107,9 +107,9 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,ARVIX_DATA_MEASURE_PR);
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,ARVIX_DATA_MEASURE_PR,ARVIX_PR);
             else if(strcmp(argv[2],"greedy")==0)
-                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_GREEDY);
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_GREEDY,ARVIX_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -142,9 +142,9 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,HOMO_DATA_MEASURE_PR); 
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,HOMO_DATA_MEASURE_PR,HOMO_PR); 
             else if(strcmp(argv[2],"greedy")==0)
-                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_GREEDY);
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_GREEDY,HOMO_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -177,9 +177,9 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"two")==0)
                 RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_2);
             else if(strcmp(argv[2],"pr")==0)
-                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,EP_DATA_MEASURE_PR); 
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,EP_DATA_MEASURE_PR,EP_PR); 
             else if(strcmp(argv[2],"greedy")==0)
-                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_GREEDY);
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_GREEDY,EP_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -218,7 +218,7 @@ int main(int argc, char** argv)
             time_1[0]=0.0f;
             time_2[0]=0.0f;
             PageRank(pr_full, csr,succ, .15f, no_nodes, no_edges, 100, 1e-6, time_1);
-            PageRank_Sparse(pr_vector,pr_csc,pr_succ,.15f,no_nodes,no_edges, 100, 1e-6,time_2);
+            PageRank_Sparse(pr_vector,pr_csc,pr_succ,.15f,no_nodes,no_edges, 100, 1e-6,time_2,ARVIX_PR);
             Verify_Pr(pr_full,pr_vector,no_nodes);
             cout<<"Generated CSR"<<endl;
             // unsigned int* seed_set = new unsigned int[no_nodes];

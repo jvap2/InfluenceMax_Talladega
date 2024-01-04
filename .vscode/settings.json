@@ -3,6 +3,7 @@
         "*.bison": "bison",
         "iosfwd": "cpp",
         "ostream": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "__config": "cpp"
     }
 }

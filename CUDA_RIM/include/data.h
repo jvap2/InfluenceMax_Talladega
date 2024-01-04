@@ -128,7 +128,8 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
 
 __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
 
-__host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, edge* edge_list, string file);
+
+__host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, edge* edge_list, string file, string pr_file);
 
 template <typename IndexType>
 __global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int node_size){
@@ -154,7 +155,7 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
 
 __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time);
 
-__host__ void PageRank_Sparse(float* pr_vector, int* global_csc, int* global_succ, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time);
+__host__ void PageRank_Sparse(float* pr_vector, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time, string pr_file);
 
 __global__ void Init_Pr(float* pr_vector, unsigned int node_size);
 
@@ -162,10 +163,12 @@ __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* 
 
 __global__ void Init_P(float* P, unsigned int node_size, float* damp);
 
-__host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file);
+__host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
 __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 
 __global__ void Init_P_Sparse(float* weight_P,const int* src,const int* succ, unsigned int node_size, float* damp);
 
 __host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_size);
+
+__host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P, unsigned int node_size, unsigned int edge_size, float damp, string file);

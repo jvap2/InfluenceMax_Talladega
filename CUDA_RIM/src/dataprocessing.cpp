@@ -134,3 +134,54 @@ void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, stri
     data.close();
 }
 
+__host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P, unsigned int node_size, unsigned int edge_size, float damp, string file){
+    ifstream data;
+    data.open(file);
+    string line,word;
+    int count =0;
+    int column = 0;
+    unsigned int edge_list_src, edge_list_dst;
+    edge_list_src = 0;
+    edge_list_dst = 0;
+    if(!data.is_open()){
+        cout<<"Cannot open file"<<endl;
+    }
+    if(data.is_open()){
+        //Check if data is open
+        while(getline(data,line)){
+            //Keep extracting data until a delimiter is found
+            stringstream stream_data(line); 
+            while(getline(stream_data,word,',')){
+                if(count==0){
+                    continue;
+                }
+                else{
+                    if(column==0){
+                        edge_list_src=stoul(word);
+                        csc[edge_list_src]++;
+                        column++;
+                    }
+                    else if(column==1){
+                        edge_list_dst=stoul(word);
+                        succ[count-1]=edge_list_dst;
+                        column++;
+                    }
+                    else{
+                        weight_P[count-1]=(1-damp)*stof(word);
+                        column++;
+                    }
+                }
+                //Extract data until ',' is found
+            }
+            count++;
+            column = 0;
+        }
+    }
+    data.close();
+    //Now, we need to prefix sum the src_ptr
+    unsigned int* src_temp = new unsigned int[node_size+1]{0};
+    for(int i=1; i<=node_size;i++){
+        src_temp[i]=src_temp[i-1]+csc[i-1];
+    }
+    copy(src_temp, src_temp+node_size+1, csc);
+}
