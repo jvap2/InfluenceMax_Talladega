@@ -95,6 +95,22 @@
 #define ND_PATH "../Graph_Data_Storage/nd.csv"
 #define ND_DATA_PATH "../Graph_Data_Storage/nd-data.csv"
 #define ND_SEED_PATH "../RIM_res/res_nd.csv"
+#define BRK_PR "../Graph_Data_Storage/berk_pr.csv"
+#define BRK_DATA_MEASURE_GREEDY "../RIM_data/berk/meas_4.csv"
+#define BRK_DATA_MEASURE_PR "../RIM_data/berk/meas_3.csv"
+#define BRK_DATA_MEASURE_2 "../RIM_data/berk/meas_2.csv"
+#define BRK_DATA_MEASURE "../RIM_data/berk/meas.csv"
+#define BRK_PATH "../Graph_Data_Storage/berk.csv"
+#define BRK_DATA_PATH "../Graph_Data_Storage/berk-data.csv"
+#define BRK_SEED_PATH "../RIM_res/res_berk.csv"
+#define GGL_PR "../Graph_Data_Storage/google_pr.csv"
+#define GGL_DATA_MEASURE_GREEDY "../RIM_data/google/meas_4.csv"
+#define GGL_DATA_MEASURE_PR "../RIM_data/google/meas_3.csv"
+#define GGL_DATA_MEASURE_2 "../RIM_data/google/meas_2.csv"
+#define GGL_DATA_MEASURE "../RIM_data/google/meas.csv"
+#define GGL_PATH "../Graph_Data_Storage/google.csv"
+#define GGL_DATA_PATH "../Graph_Data_Storage/google-data.csv"
+#define GGL_SEED_PATH "../RIM_res/res_google.csv"
 
 using namespace std;
 
