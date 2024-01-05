@@ -1,8 +1,8 @@
 #!/bin/sh
-vers=3
+
 data_set=3
-seed_size=100
-ep=.5
+
+
 if [ $vers -eq 1 ]; then
     name=one
 elif [ $vers -eq 2 ]; then

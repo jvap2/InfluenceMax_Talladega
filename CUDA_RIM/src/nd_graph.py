@@ -5,10 +5,10 @@ from check_diff import linear_threshold, independent_cascade
 from networkx.algorithms import voterank
 import sys
 
-meas_1 = "../../RIM_data/amazon/meas.csv"
-meas_2 = "../../RIM_data/amazon/meas_2.csv"
-meas_3 = "../../RIM_data/amazon/meas_3.csv"
-meas_4 = "../../RIM_data/amazon/meas_4.csv"
+meas_1 = "../../RIM_data/nd/meas.csv"
+meas_2 = "../../RIM_data/nd/meas_2.csv"
+meas_3 = "../../RIM_data/nd/meas_3.csv"
+meas_4 = "../../RIM_data/nd/meas_4.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
@@ -24,7 +24,7 @@ else:
     sys.exit(1)
 
 
-File = "../../Graph_Data_Storage/amazon0302.txt"
+File = "../../Graph_Data_Storage/web-NotreDame.txt"
 
 g = nx.read_edgelist(
     File,
@@ -32,7 +32,7 @@ g = nx.read_edgelist(
     nodetype=int
 )
 
-seed_set = pd.read_csv("../../RIM_res/res_amazon_new.csv")
+seed_set = pd.read_csv("../../RIM_res/res_nd.csv")
 seeds = seed_set.loc[:,"Seed_Set"].to_numpy()
 ## Run several simulations to evaluate the spread
 lt_num_steps = 50
@@ -96,10 +96,10 @@ vr_set = set(vr)
 seed_set = set(seeds)
 print("Intersection:",vr_set.intersection(seed_set))
 
-curip_lt_seeds = pd.read_csv("../../RIM_res/curip_amazon_LT.csv")
+curip_lt_seeds = pd.read_csv("../../RIM_res/curip_nd_LT.csv")
 curip_lt_seeds = curip_lt_seeds.loc[:,"Seed_Set"].to_numpy()
 
-curip_ic_seeds = pd.read_csv("../../RIM_res/curip_amazon_IC.csv")
+curip_ic_seeds = pd.read_csv("../../RIM_res/curip_nd_IC.csv")
 curip_ic_seeds = curip_ic_seeds.loc[:,"Seed_Set"].to_numpy()
 
 curip_lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=curip_lt_seeds)
