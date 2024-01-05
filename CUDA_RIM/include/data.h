@@ -86,8 +86,15 @@
 #define AM_DATA_MEASURE "../RIM_data/amazon/meas.csv"
 #define AM_PATH "../Graph_Data_Storage/amazon.csv"
 #define AM_DATA_PATH "../Graph_Data_Storage/amazon-data.csv"
-#define AM_SEED_PATH "../RIM_res/res_amazon_new.csv"
-
+#define AM_SEED_PATH "../RIM_res/res_amazon.csv"
+#define ND_PR "../Graph_Data_Storage/nd_pr.csv"
+#define ND_DATA_MEASURE_GREEDY "../RIM_data/nd/meas_4.csv"
+#define ND_DATA_MEASURE_PR "../RIM_data/nd/meas_3.csv"
+#define ND_DATA_MEASURE_2 "../RIM_data/nd/meas_2.csv"
+#define ND_DATA_MEASURE "../RIM_data/nd/meas.csv"
+#define ND_PATH "../Graph_Data_Storage/nd.csv"
+#define ND_DATA_PATH "../Graph_Data_Storage/nd-data.csv"
+#define ND_SEED_PATH "../RIM_res/res_nd.csv"
 
 using namespace std;
 

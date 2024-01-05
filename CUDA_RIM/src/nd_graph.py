@@ -19,6 +19,8 @@ elif ver == 2:
     f = meas_2
 elif ver == 3:
     f = meas_3
+elif ver == 4:
+    f = meas_4
 else:
     print("Wrong version number")
     sys.exit(1)

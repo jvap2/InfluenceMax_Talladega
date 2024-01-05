@@ -8,6 +8,7 @@ import sys
 meas_1 = "../../RIM_data/arvix/meas.csv"
 meas_2 = "../../RIM_data/arvix/meas_2.csv"
 meas_3 = "../../RIM_data/arvix/meas_3.csv"
+meas_4 = "../../RIM_data/arvix/meas_4.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
@@ -18,6 +19,8 @@ elif ver == 2:
     f = meas_2
 elif ver == 3:
     f = meas_3
+elif ver == 4:
+    f = meas_4
 else:
     print("Wrong version number")
     sys.exit(1)
