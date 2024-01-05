@@ -139,8 +139,8 @@ time_IMM_IC = exec_data.loc[test_trial-1, "time_cu_ic"]
 
 time_IMM_LT = exec_data.loc[test_trial-1, "time_cu_lt"]
 
-speedup_LT = time_RIM/time_IMM_LT
-speedup_IC = time_RIM/time_IMM_IC
+speedup_LT = time_IMM_LT/time_RIM
+speedup_IC = time_IMM_IC/time_RIM
 
 exec_data.loc[test_trial-1, "speedup_LT"] = speedup_LT
 exec_data.loc[test_trial-1, "speedup_IC"] = speedup_IC

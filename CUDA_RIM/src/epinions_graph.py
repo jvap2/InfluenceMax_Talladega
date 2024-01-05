@@ -35,10 +35,8 @@ else:
 
 if __name__ == "__main__":
     df = pd.read_csv("../../Graph_Data_Storage/epinions.csv")
-    src=df.loc[:,"source"].to_numpy()
-    dst=df.loc[:,"target"].to_numpy()
     df_info = pd.read_csv("../../Graph_Data_Storage/epinions_data.csv")
-    no_nodes = df_info.loc[:,"No. Nodes"].to_numpy()
+    no_nodes = df_info.loc[:,"Nodes"].to_numpy()
     no_nodes = no_nodes[0]
     print(no_nodes)
     File = "../../Graph_Data_Storage/soc-Epinions1.txt"
@@ -155,8 +153,8 @@ if __name__ == "__main__":
 
     time_IMM_LT = exec_data.loc[test_trial-1, "time_cu_lt"]
 
-    speedup_LT = time_RIM/time_IMM_LT
-    speedup_IC = time_RIM/time_IMM_IC
+    speedup_LT = time_IMM_LT/time_RIM
+    speedup_IC = time_IMM_IC/time_RIM
 
     exec_data.loc[test_trial-1, "speedup_LT"] = speedup_LT
     exec_data.loc[test_trial-1, "speedup_IC"] = speedup_IC

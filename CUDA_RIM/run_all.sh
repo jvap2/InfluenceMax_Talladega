@@ -1,5 +1,6 @@
 #!/bin/sh
 
+sh amazon_run_IMM.sh
 sh epinions_run.sh
 sh run_IMM.sh
 sh arvix_run_IMM.sh

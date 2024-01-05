@@ -79,6 +79,14 @@
 #define ARVIX_PR "../Graph_Data_Storage/arxiv_pr.csv"
 #define HOMO_PR "../Graph_Data_Storage/homo_pr.csv"
 #define EP_PR "../Graph_Data_Storage/epinions_pr.csv"
+#define AM_PR "../Graph_Data_Storage/amazon_pr.csv"
+#define AM_DATA_MEASURE_GREEDY "../RIM_data/amazon/meas_4.csv"
+#define AM_DATA_MEASURE_PR "../RIM_data/amazon/meas_3.csv"
+#define AM_DATA_MEASURE_2 "../RIM_data/amazon/meas_2.csv"
+#define AM_DATA_MEASURE "../RIM_data/amazon/meas.csv"
+#define AM_PATH "../Graph_Data_Storage/amazon.csv"
+#define AM_DATA_PATH "../Graph_Data_Storage/amazon-data.csv"
+#define AM_SEED_PATH "../RIM_res/res_amazon_new.csv"
 
 
 using namespace std;

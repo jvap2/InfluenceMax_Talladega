@@ -169,7 +169,6 @@ int main(int argc, char** argv)
             thrust::fill(csr,csr+no_nodes+1,0);
             genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
-            // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
             if(strcmp(argv[2],"one")==0)
@@ -185,6 +184,40 @@ int main(int argc, char** argv)
                 exit(0);
             }        
             Export_Seed_Set_to_CSV(seed_set,K,EP_SEED_PATH);
+
+            delete[] csr;
+            delete[] succ;
+            free(edge_list);
+        }
+        else if(strcmp(argv[1],"AM")==0){
+            unsigned int no_nodes, no_edges;
+            get_graph_info(AM_DATA_PATH, &no_nodes, &no_edges);
+            cout << "no_nodes: " << no_nodes << endl;
+            cout << "no_edges: " << no_edges << endl;
+            edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
+            readData(AM_PATH,edge_list);
+            unsigned int *csr, *succ;
+            csr = new unsigned int[no_nodes+1];
+            succ = new unsigned int[no_edges];
+            thrust::fill(succ,succ+no_edges,0);
+            thrust::fill(csr,csr+no_nodes+1,0);
+            genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            cout<<"Generated CSR"<<endl;
+            unsigned int* seed_set = new unsigned int[K];
+            // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
+            if(strcmp(argv[2],"one")==0)
+                RIM_rand_Ver1(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE);
+            else if(strcmp(argv[2],"two")==0)
+                RIM_rand_Ver2(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_2);
+            else if(strcmp(argv[2],"pr")==0)
+                RIM_rand_Ver3_PR(csr,succ,no_nodes,no_edges,seed_set, edge_list,AM_DATA_MEASURE_PR,AM_PR); 
+            else if(strcmp(argv[2],"greedy")==0)
+                RIM_rand_Ver4_Greedy(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_GREEDY,AM_PR);
+            else{
+                cout << "Please specify the version" << endl;
+                exit(0);
+            }        
+            Export_Seed_Set_to_CSV(seed_set,K,AM_SEED_PATH);
 
             delete[] csr;
             delete[] succ;
