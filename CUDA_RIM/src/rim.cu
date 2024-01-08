@@ -519,6 +519,9 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     if(!HandleCUDAError(cudaFree(rand_init))){
         std::cout<<"Error freeing rand_init"<<endl;
     }
+    if(!HandleCUDAError(cudaDeviceReset())){
+        std::cout<<"Error resetting device"<<endl;
+    }
     delete[] h_rand_vec_init;
     delete[] l2_norm_rand_vec_init;
     delete[] l2_norm_d_res;
@@ -788,6 +791,9 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     }
     if(!HandleCUDAError(cudaFree(rand_vec_init))){
         std::cout<<"Error freeing rand_vec_init"<<endl;
+    }
+    if(!HandleCUDAError(cudaDeviceReset())){
+        std::cout<<"Error resetting device"<<endl;
     }
     delete[] h_rand_vec_init;
     delete[] l2_norm_rand_vec_init;
@@ -1068,6 +1074,9 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     }
     if(!HandleCUDAError(cudaFree(rand_vec_init))){
         std::cout<<"Error freeing rand_vec_init"<<endl;
+    }
+    if(!HandleCUDAError(cudaDeviceReset())){
+        std::cout<<"Error resetting device"<<endl;
     }
     delete[] h_rand_vec_init;
     delete[] l2_norm_rand_vec_init;
