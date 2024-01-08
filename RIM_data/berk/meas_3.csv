@@ -1,1 +1,2 @@
-streams,time(ms),damping_factor,threshold,epochs,K,percent_IC_CU,percent_LT_CU,time_cu_lt,time_cu_ic,l,eps,percent_LT_RIMR,percent_IC_RIMR,percent_LT_over,percent_IC_over
+streams,time(ms),damping_factor,threshold,epochs,K,percent_IC_CU,percent_LT_CU,time_cu_lt,time_cu_ic,l,eps,percent_LT_RIMR,percent_IC_RIMR,percent_LT_over,percent_IC_over,speedup_LT,speedup_IC
+12,7711.1,0.3,0.3,30,100,0.3675597974402755,0.418542679100448,86479.392199,45405.608724,1.0,0.5,0.4169636472425317,0.3053850531938181,0.05,0.0,11.214922929154076,5.888343909947997

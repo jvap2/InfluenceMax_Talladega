@@ -1,7 +1,9 @@
 #!/bin/sh
 
 data_set=3
-
+vers=3
+seed_size=100
+ep=.5
 
 if [ $vers -eq 1 ]; then
     name=one

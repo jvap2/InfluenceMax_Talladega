@@ -1,7 +1,7 @@
 #!/bin/sh
-export vers=3
-export seed_size=100
-export ep=.5
+# export vers=3
+# export seed_size=100
+# export ep=.5
 
 sh nd_run_IMM.sh
 sh amazon_run_IMM.sh

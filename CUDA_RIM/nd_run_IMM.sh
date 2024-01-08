@@ -1,6 +1,8 @@
 #!/bin/sh
 
-
+vers=4
+seed_size=100
+ep=.5
 data_set=7
 
 if [ $vers -eq 1 ]; then

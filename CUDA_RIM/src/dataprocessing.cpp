@@ -167,6 +167,14 @@ __host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P
                         column++;
                     }
                     else{
+                        try{
+                            weight_P[count-1]=(1-damp)*stof(word);
+                        }
+                        catch(std::invalid_argument const &e){
+                            cout<<"Error at: "<<count-1<<endl;
+                            cout<<"Error: "<<e.what()<<endl;
+                            cout<<"Value "<<word<<endl;
+                        }
                         weight_P[count-1]=(1-damp)*stof(word);
                         column++;
                     }

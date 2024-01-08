@@ -1,6 +1,8 @@
 #!/bin/sh
 
-
+vers=3
+seed_size=100
+ep=.5
 data_set=9
 
 

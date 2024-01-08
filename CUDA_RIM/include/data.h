@@ -111,6 +111,16 @@
 #define GGL_PATH "../Graph_Data_Storage/google.csv"
 #define GGL_DATA_PATH "../Graph_Data_Storage/google-data.csv"
 #define GGL_SEED_PATH "../RIM_res/res_google.csv"
+#define WKT_PR "../Graph_Data_Storage/wiki_talk_pr.csv"
+#define WKT_DATA_MEASURE_GREEDY "../RIM_data/wiki_talk/meas_4.csv"
+#define WKT_DATA_MEASURE_PR "../RIM_data/wiki_talk/meas_3.csv"
+#define WKT_DATA_MEASURE_2 "../RIM_data/wiki_talk/meas_2.csv"
+#define WKT_DATA_MEASURE "../RIM_data/wiki_talk/meas.csv"
+#define WKT_PATH "../Graph_Data_Storage/wiki_talk.csv"
+#define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
+#define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
+
+#define MAX_WHILE 100 
 
 using namespace std;
 

@@ -139,7 +139,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         thrust::fill(tol,tol+NUMSTRM, 100.0f);
         int while_count = 0;
         while_count=0;
-        while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < 1000){
+        while(thrust::all_of(thrust::host, tol, tol+NUMSTRM, [=] __device__ (float x) { return x > threshold; }) && while_count < MAX_WHILE){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
@@ -398,7 +398,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
             thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
         }
         bool check = true;
-        while(check && while_count < 1000){
+        while(check && while_count < MAX_WHILE){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
@@ -669,7 +669,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
         }
         int while_count = 0;
         bool check = true;
-        while(check && while_count < 1000){
+        while(check && while_count < MAX_WHILE){
             while_count++;
            for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
@@ -959,7 +959,7 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
         }
         while_count = 0;
         bool check = true;
-        while(check && while_count < 1000){
+        while(check && while_count < MAX_WHILE){
             while_count++;
             for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
