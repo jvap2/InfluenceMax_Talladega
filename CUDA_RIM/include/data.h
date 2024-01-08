@@ -74,6 +74,11 @@
 #define ARVIX_DATA_MEASURE_GREEDY "../RIM_data/arvix/meas_4.csv"
 #define HOMO_DATA_MEASURE_GREEDY "../RIM_data/syn/meas_4.csv"
 #define EP_DATA_MEASURE_GREEDY "../RIM_data/epinions/meas_4.csv"
+#define HEPTH_DATA_MEASURE_SIG "../RIM_data/HepTh/meas_5.csv"
+#define WIKI_VOTE_DATA_MEASURE_SIG "../RIM_data/wiki-vote/meas_5.csv"
+#define ARVIX_DATA_MEASURE_SIG "../RIM_data/arvix/meas_5.csv"
+#define HOMO_DATA_MEASURE_SIG "../RIM_data/syn/meas_5.csv"
+#define EP_DATA_MEASURE_SIG "../RIM_data/epinions/meas_5.csv"
 #define HEPTH_PR "../Graph_Data_Storage/hepth_pr.csv"
 #define WIKI_VOTE_PR "../Graph_Data_Storage/wikivote_pr.csv"
 #define ARVIX_PR "../Graph_Data_Storage/arxiv_pr.csv"
@@ -81,6 +86,7 @@
 #define EP_PR "../Graph_Data_Storage/epinions_pr.csv"
 #define AM_PR "../Graph_Data_Storage/amazon_pr.csv"
 #define AM_DATA_MEASURE_GREEDY "../RIM_data/amazon/meas_4.csv"
+#define AM_DATA_MEASURE_SIG "../RIM_data/amazon/meas_5.csv"
 #define AM_DATA_MEASURE_PR "../RIM_data/amazon/meas_3.csv"
 #define AM_DATA_MEASURE_2 "../RIM_data/amazon/meas_2.csv"
 #define AM_DATA_MEASURE "../RIM_data/amazon/meas.csv"
@@ -89,6 +95,7 @@
 #define AM_SEED_PATH "../RIM_res/res_amazon.csv"
 #define ND_PR "../Graph_Data_Storage/nd_pr.csv"
 #define ND_DATA_MEASURE_GREEDY "../RIM_data/nd/meas_4.csv"
+#define ND_DATA_MEASURE_SIG "../RIM_data/nd/meas_5.csv"
 #define ND_DATA_MEASURE_PR "../RIM_data/nd/meas_3.csv"
 #define ND_DATA_MEASURE_2 "../RIM_data/nd/meas_2.csv"
 #define ND_DATA_MEASURE "../RIM_data/nd/meas.csv"
@@ -97,6 +104,7 @@
 #define ND_SEED_PATH "../RIM_res/res_nd.csv"
 #define BRK_PR "../Graph_Data_Storage/berk_pr.csv"
 #define BRK_DATA_MEASURE_GREEDY "../RIM_data/berk/meas_4.csv"
+#define BRK_DATA_MEASURE_SIG "../RIM_data/berk/meas_5.csv"
 #define BRK_DATA_MEASURE_PR "../RIM_data/berk/meas_3.csv"
 #define BRK_DATA_MEASURE_2 "../RIM_data/berk/meas_2.csv"
 #define BRK_DATA_MEASURE "../RIM_data/berk/meas.csv"
@@ -105,6 +113,7 @@
 #define BRK_SEED_PATH "../RIM_res/res_berk.csv"
 #define GGL_PR "../Graph_Data_Storage/google_pr.csv"
 #define GGL_DATA_MEASURE_GREEDY "../RIM_data/google/meas_4.csv"
+#define GGL_DATA_MEASURE_SIG "../RIM_data/google/meas_5.csv"
 #define GGL_DATA_MEASURE_PR "../RIM_data/google/meas_3.csv"
 #define GGL_DATA_MEASURE_2 "../RIM_data/google/meas_2.csv"
 #define GGL_DATA_MEASURE "../RIM_data/google/meas.csv"
@@ -113,6 +122,7 @@
 #define GGL_SEED_PATH "../RIM_res/res_google.csv"
 #define WKT_PR "../Graph_Data_Storage/wiki_talk_pr.csv"
 #define WKT_DATA_MEASURE_GREEDY "../RIM_data/wiki_talk/meas_4.csv"
+#define WKT_DATA_MEASURE_SIG "../RIM_data/wiki_talk/meas_5.csv"
 #define WKT_DATA_MEASURE_PR "../RIM_data/wiki_talk/meas_3.csv"
 #define WKT_DATA_MEASURE_2 "../RIM_data/wiki_talk/meas_2.csv"
 #define WKT_DATA_MEASURE "../RIM_data/wiki_talk/meas.csv"
@@ -205,6 +215,8 @@ __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* 
 __global__ void Init_P(float* P, unsigned int node_size, float* damp);
 
 __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
+
+__host__ void  RIM_rand_Ver5_Sig(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
 __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 

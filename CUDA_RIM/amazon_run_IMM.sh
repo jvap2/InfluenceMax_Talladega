@@ -13,6 +13,8 @@ elif [ $vers -eq 3 ]; then
     name=pr
 elif [ $vers -eq 4 ]; then
     name=greedy
+elif [ $vers -eq 5 ]; then
+    name=sigmoid
 else
     echo "invalid option"
 fi
