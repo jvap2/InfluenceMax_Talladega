@@ -37,3 +37,5 @@ python3 collectdata_lt.py $data_set $vers
 cd ../../../../CUDA_RIM/src
 python3 convertHepTh.py
 python3 HepTh_graph.py $vers $seed_size
+cd ../../RIM_res
+python3 test_communities.py $data_set $vers
