@@ -1,7 +1,7 @@
 #!/bin/sh
 
-vers=5
-seed_size=100
+vers=6
+seed_size=150
 ep=.5
 data_set=7
 
@@ -15,6 +15,8 @@ elif [ $vers -eq 4 ]; then
     name=greedy
 elif [ $vers -eq 5 ]; then
     name=sigmoid
+elif [ $vers -eq 6 ]; then
+    name=tanh
 else
     echo "invalid option"
 fi

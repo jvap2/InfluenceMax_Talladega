@@ -15,6 +15,8 @@ elif [ $vers -eq 4 ]; then
     name=greedy
 elif [ $vers -eq 5 ]; then
     name=sigmoid
+elif [ $vers -eq 6 ]; then
+    name=tanh
 else
     echo "invalid option"
 fi

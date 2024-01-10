@@ -11,6 +11,7 @@ meas_2 = "../../RIM_data/wiki-vote/meas_2.csv"
 meas_3 = "../../RIM_data/wiki-vote/meas_3.csv"
 meas_4 = "../../RIM_data/wiki-vote/meas_4.csv"
 meas_5 = "../../RIM_data/wiki-vote/meas_5.csv"
+meas_6 = "../../RIM_data/wiki-vote/meas_6.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
@@ -25,6 +26,8 @@ elif ver == 4:
     f = meas_4
 elif ver == 5:
     f = meas_5
+elif ver == 6:
+    f = meas_6
 else:
     print("Wrong version number")
     sys.exit(1)
