@@ -14,6 +14,7 @@ meas_3 = "../../RIM_data/syn/meas_3.csv"
 meas_4 = "../../RIM_data/syn/meas_4.csv"
 meas_5 = "../../RIM_data/syn/meas_5.csv"
 meas_6 = "../../RIM_data/syn/meas_6.csv"
+meas_7 = "../../RIM_data/syn/meas_7.csv"
 
 
 ver = int(sys.argv[1])
@@ -31,6 +32,8 @@ elif ver == 5:
     f = meas_5
 elif ver == 6:
     f = meas_6
+elif ver == 7:
+    f = meas_7
 else:
     print("Wrong version number")
     sys.exit(1)

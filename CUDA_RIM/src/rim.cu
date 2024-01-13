@@ -1884,7 +1884,7 @@ __host__ void  RIM_rand_Ver7_PR_Rand(unsigned int* csc, unsigned int* succ, unsi
                 std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
                 exit(1);
             }
-            thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+(i+1)*edge_size, 1.0f);
+            // thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+(i+1)*edge_size, 1.0f);
         }
     }
     cudaEventRecord(stop);

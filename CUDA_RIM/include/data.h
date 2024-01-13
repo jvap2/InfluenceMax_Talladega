@@ -37,7 +37,7 @@
 #define TPB 256
 #define K 150
 
-#define NUMSTRM 10
+#define NUMSTRM 6
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
@@ -84,6 +84,11 @@
 #define ARVIX_DATA_MEASURE_TANH "../RIM_data/arvix/meas_6.csv"
 #define HOMO_DATA_MEASURE_TANH "../RIM_data/syn/meas_6.csv"
 #define EP_DATA_MEASURE_TANH "../RIM_data/epinions/meas_6.csv"
+#define HEPTH_DATA_MEASURE_RPR "../RIM_data/HepTh/meas_7.csv"
+#define WIKI_VOTE_DATA_MEASURE_RPR "../RIM_data/wiki-vote/meas_7.csv"
+#define ARVIX_DATA_MEASURE_RPR "../RIM_data/arvix/meas_7.csv"
+#define HOMO_DATA_MEASURE_RPR "../RIM_data/syn/meas_7.csv"
+#define EP_DATA_MEASURE_RPR "../RIM_data/epinions/meas_7.csv"
 #define HEPTH_PR "../Graph_Data_Storage/hepth_pr.csv"
 #define WIKI_VOTE_PR "../Graph_Data_Storage/wikivote_pr.csv"
 #define ARVIX_PR "../Graph_Data_Storage/arxiv_pr.csv"
@@ -93,6 +98,7 @@
 #define AM_DATA_MEASURE_GREEDY "../RIM_data/amazon/meas_4.csv"
 #define AM_DATA_MEASURE_SIG "../RIM_data/amazon/meas_5.csv"
 #define AM_DATA_MEASURE_TANH "../RIM_data/amazon/meas_6.csv"
+#define AM_DATA_MEASURE_RPR "../RIM_data/amazon/meas_7.csv"
 #define AM_DATA_MEASURE_PR "../RIM_data/amazon/meas_3.csv"
 #define AM_DATA_MEASURE_2 "../RIM_data/amazon/meas_2.csv"
 #define AM_DATA_MEASURE "../RIM_data/amazon/meas.csv"
@@ -103,6 +109,7 @@
 #define ND_DATA_MEASURE_GREEDY "../RIM_data/nd/meas_4.csv"
 #define ND_DATA_MEASURE_SIG "../RIM_data/nd/meas_5.csv"
 #define ND_DATA_MEASURE_TANH "../RIM_data/nd/meas_6.csv"
+#define ND_DATA_MEASURE_RPR "../RIM_data/nd/meas_7.csv"
 #define ND_DATA_MEASURE_PR "../RIM_data/nd/meas_3.csv"
 #define ND_DATA_MEASURE_2 "../RIM_data/nd/meas_2.csv"
 #define ND_DATA_MEASURE "../RIM_data/nd/meas.csv"
@@ -113,6 +120,7 @@
 #define BRK_DATA_MEASURE_GREEDY "../RIM_data/berk/meas_4.csv"
 #define BRK_DATA_MEASURE_SIG "../RIM_data/berk/meas_5.csv"
 #define BRK_DATA_MEASURE_TANH "../RIM_data/berk/meas_6.csv"
+#define BRK_DATA_MEASURE_RPR "../RIM_data/berk/meas_7.csv"
 #define BRK_DATA_MEASURE_PR "../RIM_data/berk/meas_3.csv"
 #define BRK_DATA_MEASURE_2 "../RIM_data/berk/meas_2.csv"
 #define BRK_DATA_MEASURE "../RIM_data/berk/meas.csv"
@@ -123,6 +131,7 @@
 #define GGL_DATA_MEASURE_GREEDY "../RIM_data/google/meas_4.csv"
 #define GGL_DATA_MEASURE_SIG "../RIM_data/google/meas_5.csv"
 #define GGL_DATA_MEASURE_TANH "../RIM_data/google/meas_6.csv"
+#define GGL_DATA_MEASURE_RPR "../RIM_data/google/meas_7.csv"
 #define GGL_DATA_MEASURE_PR "../RIM_data/google/meas_3.csv"
 #define GGL_DATA_MEASURE_2 "../RIM_data/google/meas_2.csv"
 #define GGL_DATA_MEASURE "../RIM_data/google/meas.csv"
@@ -133,6 +142,7 @@
 #define WKT_DATA_MEASURE_GREEDY "../RIM_data/wiki_talk/meas_4.csv"
 #define WKT_DATA_MEASURE_SIG "../RIM_data/wiki_talk/meas_5.csv"
 #define WKT_DATA_MEASURE_TANH "../RIM_data/wiki_talk/meas_6.csv"
+#define WKT_DATA_MEASURE_RPR "../RIM_data/wiki_talk/meas_7.csv"
 #define WKT_DATA_MEASURE_PR "../RIM_data/wiki_talk/meas_3.csv"
 #define WKT_DATA_MEASURE_2 "../RIM_data/wiki_talk/meas_2.csv"
 #define WKT_DATA_MEASURE "../RIM_data/wiki_talk/meas.csv"
