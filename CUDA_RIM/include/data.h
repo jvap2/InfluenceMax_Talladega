@@ -37,7 +37,7 @@
 #define TPB 256
 #define K 150
 
-#define NUMSTRM 8
+#define NUMSTRM 10
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
@@ -230,6 +230,8 @@ __host__ void  RIM_rand_Ver5_Sig(unsigned int* csc, unsigned int* succ, unsigned
 
 __host__ void  RIM_rand_Ver6_Tanh(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
+__host__ void  RIM_rand_Ver7_PR_Rand(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
+
 __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 
 __global__ void Init_P_Sparse(float* weight_P,const int* src,const int* succ, unsigned int node_size, float* damp);
@@ -237,3 +239,10 @@ __global__ void Init_P_Sparse(float* weight_P,const int* src,const int* succ, un
 __host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_size);
 
 __host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P, unsigned int node_size, unsigned int edge_size, float damp, string file);
+
+
+//Device Functions
+
+__device__ float eval_values(float rand_num, float val,float threshold);
+
+__device__ float eval_values_v2(float rand_num, float val,float threshold);

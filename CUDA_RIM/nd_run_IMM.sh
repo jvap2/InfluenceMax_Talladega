@@ -8,17 +8,17 @@ data_set=7
 
 for vers in 2 3 4 5 6 7
 do 
-    if [ $vers -eq 1 ]; then
+    if [ "$vers" -eq 1 ]; then
         name=one
-    elif [ $vers -eq 2 ]; then
+    elif [ "$vers" -eq 2 ]; then
         name=two
-    elif [ $vers -eq 3 ]; then
+    elif [ "$vers" -eq 3 ]; then
         name=pr
-    elif [ $vers -eq 4 ]; then
+    elif [ "$vers" -eq 4 ]; then
         name=greedy
-    elif [ $vers -eq 5 ]; then
+    elif [ "$vers" -eq 5 ]; then
         name=sigmoid
-    elif [ $vers -eq 6 ]; then
+    elif [ "$vers" -eq 6 ]; then
         name=tanh
     else
         echo "invalid option"
@@ -32,7 +32,7 @@ do
     conan install . --build missing -o gpu=nvidia
     conan build . -o gpu=nvidia
     cd build/Release/tools
-    if [$vers -eq 2]; then 
+    if [ "$vers" -eq 2 ]; then 
         ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_IC.json
         ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_LT.json
     fi
@@ -42,4 +42,5 @@ do
     python3 nd_graph.py $vers $seed_size
     cd ../../RIM_res
     python3 test_communities.py $data_set $vers
+    cd ../CUDA_RIM
 done
