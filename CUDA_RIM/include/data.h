@@ -56,7 +56,7 @@
 #define EP_DATA_PATH "../Graph_Data_Storage/epinions_data.csv"
 #define EP_SEED_PATH "../RIM_res/res_ep.csv"
 #define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh.csv"
-#define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh_csc.csv"
+#define HEPTH_CSC_PATH "../Graph_Data_Storage/ca-HepTh_csc.csv"
 #define HEPTH_DATA_PATH "../Graph_Data_Storage/ca-HepTh-data.csv"
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
 #define HEPTH_DATA_MEASURE "../RIM_data/HepTh/meas.csv"

@@ -24,7 +24,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(HEPTH_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(HEPTH_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(HEPTH_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -64,7 +71,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(WIKI_VOTE_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(WIKI_VOTE_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(WIKI_VOTE_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -104,7 +118,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(ARVIX_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(ARVIX_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(ARVIX_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -144,7 +165,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(HOMO_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(HOMO_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(HOMO_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -185,7 +213,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(EP_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(EP_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(EP_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -225,7 +260,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(AM_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(AM_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(AM_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -265,7 +307,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(ND_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(ND_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(ND_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -305,7 +354,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(GGL_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(GGL_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(GGL_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -345,7 +401,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(BRK_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(BRK_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(BRK_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -385,7 +448,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(WKT_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(WKT_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(WKT_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
@@ -425,7 +495,14 @@ int main(int argc, char** argv)
             cout << "no_nodes: " << no_nodes << endl;
             cout << "no_edges: " << no_edges << endl;
             edge* edge_list= (edge*)malloc(sizeof(edge)*no_edges);
-            readData(ARVIX_PATH,edge_list);
+            if(strcmp(argv[3],"csr")==0)
+                readData(ARVIX_PATH,edge_list);
+            else if(strcmp(argv[3],"csc")==0)
+                readData(ARVIX_CSC_PATH,edge_list);
+            else{
+                cout << "Please specify the random walk direction" << endl;
+                exit(0);
+            }
             unsigned int *csr, *succ;
             csr = new unsigned int[no_nodes+1];
             succ = new unsigned int[no_edges];
