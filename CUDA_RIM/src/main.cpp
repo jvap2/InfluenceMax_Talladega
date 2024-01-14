@@ -37,7 +37,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -84,7 +87,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -131,7 +137,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -178,7 +187,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             // unsigned int* seed_set = new unsigned int[no_nodes];
             unsigned int* seed_set = new unsigned int[K];
@@ -226,7 +238,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -273,7 +288,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -320,7 +338,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -367,7 +388,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -414,7 +438,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -461,7 +488,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             cout<<"Generated CSR"<<endl;
             unsigned int* seed_set = new unsigned int[K];
             // CheckSparseMatVec(csr,succ,edge_list,no_nodes,no_edges);
@@ -508,7 +538,10 @@ int main(int argc, char** argv)
             succ = new unsigned int[no_edges];
             thrust::fill(succ,succ+no_edges,0);
             thrust::fill(csr,csr+no_nodes+1,0);
-            genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            if(strcmp(argv[3],"csr")==0)
+                genCSR<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
+            else if(strcmp(argv[3],"csc")==0)
+                genCSC<unsigned int>(edge_list,csr,succ,no_nodes,no_edges);
             int *pr_csc,*pr_succ;
             pr_csc = new int[no_nodes+1];
             pr_succ = new int[no_edges];
