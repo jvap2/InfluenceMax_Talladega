@@ -65,8 +65,8 @@ if vers ==4:
 if vers ==5:
     File = "../Graph_Data_Storage/soc-Epinions1.txt"
     top = pd.read_csv("res_ep.csv").to_numpy().flatten()
-    lt_set = pd.read_csv("curip_ep_LT.csv").to_numpy().flatten()
-    ic_set = pd.read_csv("curip_ep_IC.csv").to_numpy().flatten()
+    lt_set = pd.read_csv("curip_epinions_LT.csv").to_numpy().flatten()
+    ic_set = pd.read_csv("curip_epinions_IC.csv").to_numpy().flatten()
     if rim_vers==1:
         time_file = "../RIM_data/epinions/meas.csv"
     elif rim_vers==2:

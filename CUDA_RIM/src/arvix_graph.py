@@ -16,6 +16,7 @@ meas_7 = "../../RIM_data/arvix/meas_7.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
+direct = str(sys.argv[3])
 
 if ver == 1:
     f = meas_1
@@ -164,6 +165,7 @@ exec_data.loc[test_trial-1, "percent_LT_over"] = lt_inter_len/k
 exec_data.loc[test_trial-1, "percent_IC_over"] = ic_inter_len/k
 exec_data.loc[test_trial-1, "LT_threshold"] = lt_threshold
 exec_data.loc[test_trial-1, "IC_threshold"] = ic_threshold
+exec_data.loc[test_trial-1,"dir"]=direct
 
 time_RIM = exec_data.loc[test_trial-1, "time(ms)"]
 

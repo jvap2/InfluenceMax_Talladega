@@ -4,7 +4,7 @@ vers=3
 seed_size=150
 ep=.5
 data_set=7
-dir = 1
+walk=1
 
 
 # for vers in 2 3 4 5 6 7
@@ -28,10 +28,10 @@ else
 fi
 
 
-if [ $dir -eq 0]; then
-    dir_name = csr
-elif [ $dir -eq 1]; then
-    dir_name = csc
+if [ $walk -eq 0 ]; then
+    dname=csr
+elif [ $walk -eq 1 ]; then
+    dname=csc
 else
     echo "invalid option"
 fi
@@ -39,7 +39,7 @@ fi
 
 make clean
 make IMM
-./bin/IMM ND $name $dir_name
+./bin/IMM ND $name $dname
 cd ../ripples
 conan create conan/trng
 conan create conan/nvidia-cub
@@ -53,7 +53,7 @@ fi
 python3 collectdata_ic.py $data_set $vers
 python3 collectdata_lt.py $data_set $vers
 cd ../../../../CUDA_RIM/src
-python3 nd_graph.py $vers $seed_size
+python3 nd_graph.py $vers $seed_size $dname
 cd ../../RIM_res
 python3 test_communities.py $data_set $vers
 cd ../CUDA_RIM

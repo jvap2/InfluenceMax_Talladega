@@ -4,7 +4,7 @@ vers=3
 seed_size=100
 ep=.5
 data_set=9
-dir = 1
+walk=1
 
 if [ $vers -eq 1 ]; then
     name=one
@@ -24,17 +24,17 @@ else
     echo "invalid option"
 fi
 
-if [ $dir -eq 0]; then
-    dir_name = csr
-elif [ $dir -eq 1]; then
-    dir_name = csc
+if [ $walk -eq 0 ]; then
+    dname=csr
+elif [ $walk -eq 1 ]; then
+    dname=csc
 else
     echo "invalid option"
 fi
 
 make clean
 make IMM
-./bin/IMM BRK $name $dir_name
+./bin/IMM BRK $name $dname
 cd ../ripples
 conan create conan/trng
 conan create conan/nvidia-cub
@@ -47,6 +47,6 @@ python3 collectdata_ic.py $data_set $vers
 python3 collectdata_lt.py $data_set $vers
 cd ../../../../CUDA_RIM/src
 python3 convertberk.py 
-python3 berk_graph.py $vers $seed_size
+python3 berk_graph.py $vers $seed_size $dname
 cd ../../RIM_res
 python3 test_communities.py $data_set $vers

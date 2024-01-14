@@ -15,6 +15,7 @@ meas_7 = "../../RIM_data/nd/meas_7.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
+direct = str(sys.argv[3])
 
 if ver == 1:
     f = meas_1
@@ -105,6 +106,7 @@ exec_data.loc[test_trial-1, "percent_LT_RAND"] = rand_lt_iterations[-1]["node_co
 exec_data.loc[test_trial-1, "percent_IC_RAND"] = (rand_ic_iterations[-1]["node_count"][2]+rand_ic_iterations[-1]["node_count"][1])/len(g.nodes())
 exec_data.loc[test_trial-1,"LT_threshold"] = lt_threshold
 exec_data.loc[test_trial-1,"IC_threshold"] = ic_threshold
+exec_data.loc[test_trial-1,"dir"]=direct
 exec_data.to_csv(f,index=False)
 
 
