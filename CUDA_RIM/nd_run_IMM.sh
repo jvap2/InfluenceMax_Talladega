@@ -1,9 +1,10 @@
 #!/bin/sh
 
-vers=7
+vers=3
 seed_size=150
 ep=.5
 data_set=7
+dir = 1
 
 
 # for vers in 2 3 4 5 6 7
@@ -25,16 +26,27 @@ elif [ $vers -eq 7 ]; then
 else
     echo "invalid option"
 fi
+
+
+if [ $dir -eq 0]; then
+    dir_name = csr
+elif [ $dir -eq 1]; then
+    dir_name = csc
+else
+    echo "invalid option"
+fi
+
+
 make clean
 make IMM
-./bin/IMM ND $name
+./bin/IMM ND $name $dir_name
 cd ../ripples
 conan create conan/trng
 conan create conan/nvidia-cub
 conan install . --build missing -o gpu=nvidia
 conan build . -o gpu=nvidia
 cd build/Release/tools
-if [ "$vers" -eq 2 ]; then 
+if [ "$vers" -eq 7 ]; then 
     ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_IC.json
     ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_LT.json
 fi

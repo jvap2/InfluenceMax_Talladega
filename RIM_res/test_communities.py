@@ -6,7 +6,7 @@ import sys
 vers = int(sys.argv[1])
 rim_vers = int(sys.argv[2])
 if vers ==2:
-    File = "../../Graph_Data_Storage/ca-GrQc.txt"
+    File = "../Graph_Data_Storage/ca-GrQc.txt"
     top = pd.read_csv("res_arvix_new.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_arvix_LT_new.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_arvix_IC_new.csv").to_numpy().flatten()
@@ -25,7 +25,7 @@ if vers ==2:
     elif rim_vers==7:
         time_file = "../RIM_data/arvix/meas_7.csv"
 if vers ==3:
-    File = "../../Graph_Data_Storage/ca-HepTh.txt"
+    File = "../Graph_Data_Storage/ca-HepTh.txt"
     top = pd.read_csv("res_hepth.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_hepth_LT_new.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_hepth_IC_new.csv").to_numpy().flatten()
@@ -44,7 +44,7 @@ if vers ==3:
     elif rim_vers==7:
         time_file = "../RIM_data/HepTh/meas_7.csv"
 if vers ==4:
-    File = "../../Graph_Data_Storage/wiki-Vote.txt"
+    File = "../Graph_Data_Storage/wiki-Vote.txt"
     top = pd.read_csv("res_wiki.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_wiki_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_wiki_IC.csv").to_numpy().flatten()
@@ -63,7 +63,7 @@ if vers ==4:
     elif rim_vers==7:
         time_file = "../RIM_data/wiki-vote/meas_7.csv"
 if vers ==5:
-    File = "../../Graph_Data_Storage/soc-Epinions1.txt"
+    File = "../Graph_Data_Storage/soc-Epinions1.txt"
     top = pd.read_csv("res_ep.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_ep_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_ep_IC.csv").to_numpy().flatten()
@@ -82,7 +82,7 @@ if vers ==5:
     elif rim_vers==7:
         time_file = "../RIM_data/epinions/meas_7.csv"
 if vers ==6:
-    File = "../../Graph_Data_Storage/amazon0302.txt"
+    File = "../Graph_Data_Storage/amazon0302.txt"
     top = pd.read_csv("res_amazon.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_amazon_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_amazon_IC.csv").to_numpy().flatten()
@@ -120,7 +120,7 @@ if vers == 7:
     elif rim_vers==7:
         time_file = "../RIM_data/nd/meas_7.csv"
 if vers ==8:
-    File ="../../Graph_Data_Storage/web-Google.txt"
+    File ="../Graph_Data_Storage/web-Google.txt"
     top = pd.read_csv("res_google.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_google_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_google_IC.csv").to_numpy().flatten()
@@ -139,7 +139,7 @@ if vers ==8:
     elif rim_vers==7:
         time_file = "../RIM_data/google/meas_7.csv"
 if vers ==9:
-    File = "../../Graph_Data_Storage/web-BerkStan.txt"
+    File = "../Graph_Data_Storage/web-BerkStan.txt"
     top = pd.read_csv("res_berk_new.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_berk_LT_new.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_berk_IC_new.csv").to_numpy().flatten()
@@ -158,7 +158,7 @@ if vers ==9:
     elif rim_vers==7:
         time_file = "../RIM_data/berk/meas_7.csv"
 if vers ==10:
-    File = "../../Graph_Data_Storage/wiki-Talk.txt"
+    File = "../Graph_Data_Storage/wiki-Talk.txt"
     top = pd.read_csv("res_wiki_talk.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_wiki_talk_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_wiki_talk_IC.csv").to_numpy().flatten()

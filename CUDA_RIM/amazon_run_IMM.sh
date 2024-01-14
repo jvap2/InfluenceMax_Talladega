@@ -1,9 +1,10 @@
 #!/bin/sh
 
-vers=4
-seed_size=100
+vers=7
+seed_size=150
 ep=.5
 data_set=6
+dir = 1
 
 if [ $vers -eq 1 ]; then
     name=one
@@ -23,9 +24,17 @@ else
     echo "invalid option"
 fi
 
+if [ $dir -eq 0]; then
+    dir_name = csr
+elif [ $dir -eq 1]; then
+    dir_name = csc
+else
+    echo "invalid option"
+fi
+
 make clean
 make IMM
-./bin/IMM AM $name
+./bin/IMM AM $name $dir_name
 cd ../ripples
 conan create conan/trng
 conan create conan/nvidia-cub

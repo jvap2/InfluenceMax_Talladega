@@ -4,6 +4,7 @@ import networkx as nx
 from check_diff import linear_threshold, independent_cascade
 from networkx.algorithms import voterank
 import sys
+import random
 
 meas_1 = "../../RIM_data/arvix/meas.csv"
 meas_2 = "../../RIM_data/arvix/meas_2.csv"
@@ -42,6 +43,8 @@ g = nx.read_edgelist(
     create_using=nx.DiGraph(),
     nodetype=int
 )
+
+no_nodes = g.number_of_nodes()
 
 seed_set = pd.read_csv("../../RIM_res/res_arvix_new.csv")
 seeds = seed_set.loc[:,"Seed_Set"].to_numpy()
@@ -113,16 +116,29 @@ curip_lt_seeds = curip_lt_seeds.loc[:,"Seed_Set"].to_numpy()
 curip_ic_seeds = pd.read_csv("../../RIM_res/curip_arvix_IC_new.csv")
 curip_ic_seeds = curip_ic_seeds.loc[:,"Seed_Set"].to_numpy()
 
+rand_chance = np.arange(no_nodes)
+np.random.shuffle(rand_chance)
+
+rand_seeds = rand_chance[:ic_seed_set_size]
+
 curip_lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=curip_lt_seeds)
+rand_lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=rand_seeds)
 lt_iterations = curip_lt_model.iteration_bunch(lt_num_steps)
+rand_lt_iterations = rand_lt_model.iteration_bunch(lt_num_steps)
 print("Final Spread curip, LT",lt_iterations[-1]["node_count"])
+print("Final Spread rand, LT",rand_lt_iterations[-1]["node_count"])
 # Run the model
 curip_ic_model = independent_cascade(graph=g, threshold=ic_threshold, seed_set=curip_ic_seeds)
+rand_ic_model = independent_cascade(graph=g, threshold=ic_threshold, seed_set=rand_seeds)
 ic_iterations = curip_ic_model.iteration_bunch(ic_num_steps)
+rand_ic_iterations = rand_ic_model.iteration_bunch(ic_num_steps)
 spread_3 = []
+spread_4 = []
 for iteration in ic_iterations:
     spread_3.append(iteration['node_count'][1])
 print("Final Spread, curip RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
+for iteration in rand_ic_iterations:
+    spread_4.append(iteration['node_count'][1])
 
 curip_lt_set = set(curip_lt_seeds)
 curip_ic_set = set(curip_ic_seeds)
@@ -142,8 +158,12 @@ exec_data = pd.read_csv(f)
 test_trial=exec_data.shape[0]
 exec_data.loc[test_trial-1, "percent_LT_CU"] = percent_curip_lt_spread
 exec_data.loc[test_trial-1, "percent_IC_CU"] = percent_curip_ic_spread
+exec_data.loc[test_trial-1, "percent_LT_RAND"] = rand_lt_iterations[-1]["node_count"][1]/len(g.nodes())
+exec_data.loc[test_trial-1, "percent_IC_RAND"] = spread_4[-1]/len(g.nodes())
 exec_data.loc[test_trial-1, "percent_LT_over"] = lt_inter_len/k 
 exec_data.loc[test_trial-1, "percent_IC_over"] = ic_inter_len/k
+exec_data.loc[test_trial-1, "LT_threshold"] = lt_threshold
+exec_data.loc[test_trial-1, "IC_threshold"] = ic_threshold
 
 time_RIM = exec_data.loc[test_trial-1, "time(ms)"]
 

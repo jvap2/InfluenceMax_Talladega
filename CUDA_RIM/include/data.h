@@ -3,9 +3,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>   
-#include<algorithm>
-#include<cstdlib>
-#include<ctime>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <cmath>
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -37,21 +37,26 @@
 #define TPB 256
 #define K 150
 
-#define NUMSTRM 6
+#define NUMSTRM 10
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
+#define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
 #define HOMO_DATA_PATH "../Graph_Data_Storage/homo_info.csv"
 #define SEED_PATH "../RIM_res/res_4000.csv"
 #define ARVIX_PATH "../Graph_Data_Storage/ca-GrQc.csv"
+#define ARVIX_CSC_PATH "../Graph_Data_Storage/ca-GrQc_csc.csv"
 #define ARVIX_DATA_PATH "../Graph_Data_Storage/ca-GrQc-data.csv"
 #define ARVIX_SEED_PATH "../RIM_res/res_arvix.csv"
 #define WIKI_VOTE_PATH "../Graph_Data_Storage/wikivote.csv"
+#define WIKI_VOTE_CSC_PATH "../Graph_Data_Storage/wikivote_csc.csv"
 #define WIKI_VOTE_DATA_PATH "../Graph_Data_Storage/wikivote_data.csv"
 #define WIKI_VOTE_SEED_PATH "../RIM_res/res_wiki.csv"
 #define EP_PATH "../Graph_Data_Storage/epinions.csv"
+#define EP_CSC_PATH "../Graph_Data_Storage/epinions_csc.csv"
 #define EP_DATA_PATH "../Graph_Data_Storage/epinions_data.csv"
 #define EP_SEED_PATH "../RIM_res/res_ep.csv"
 #define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh.csv"
+#define HEPTH_PATH "../Graph_Data_Storage/ca-HepTh_csc.csv"
 #define HEPTH_DATA_PATH "../Graph_Data_Storage/ca-HepTh-data.csv"
 #define HEPTH_SEED_PATH "../RIM_res/res_HepTh.csv"
 #define HEPTH_DATA_MEASURE "../RIM_data/HepTh/meas.csv"
@@ -103,6 +108,7 @@
 #define AM_DATA_MEASURE_2 "../RIM_data/amazon/meas_2.csv"
 #define AM_DATA_MEASURE "../RIM_data/amazon/meas.csv"
 #define AM_PATH "../Graph_Data_Storage/amazon.csv"
+#define AM_CSC_PATH "../Graph_Data_Storage/amazon_csc.csv"
 #define AM_DATA_PATH "../Graph_Data_Storage/amazon-data.csv"
 #define AM_SEED_PATH "../RIM_res/res_amazon.csv"
 #define ND_PR "../Graph_Data_Storage/nd_pr.csv"
@@ -114,6 +120,7 @@
 #define ND_DATA_MEASURE_2 "../RIM_data/nd/meas_2.csv"
 #define ND_DATA_MEASURE "../RIM_data/nd/meas.csv"
 #define ND_PATH "../Graph_Data_Storage/nd.csv"
+#define ND_CSC_PATH "../Graph_Data_Storage/nd_csc.csv"
 #define ND_DATA_PATH "../Graph_Data_Storage/nd-data.csv"
 #define ND_SEED_PATH "../RIM_res/res_nd.csv"
 #define BRK_PR "../Graph_Data_Storage/berk_pr.csv"
@@ -125,6 +132,7 @@
 #define BRK_DATA_MEASURE_2 "../RIM_data/berk/meas_2.csv"
 #define BRK_DATA_MEASURE "../RIM_data/berk/meas.csv"
 #define BRK_PATH "../Graph_Data_Storage/berk.csv"
+#define BRK_CSC_PATH "../Graph_Data_Storage/berk_csc.csv"
 #define BRK_DATA_PATH "../Graph_Data_Storage/berk-data.csv"
 #define BRK_SEED_PATH "../RIM_res/res_berk.csv"
 #define GGL_PR "../Graph_Data_Storage/google_pr.csv"
@@ -136,6 +144,7 @@
 #define GGL_DATA_MEASURE_2 "../RIM_data/google/meas_2.csv"
 #define GGL_DATA_MEASURE "../RIM_data/google/meas.csv"
 #define GGL_PATH "../Graph_Data_Storage/google.csv"
+#define GGL_CSC_PATH "../Graph_Data_Storage/google_csc.csv"
 #define GGL_DATA_PATH "../Graph_Data_Storage/google-data.csv"
 #define GGL_SEED_PATH "../RIM_res/res_google.csv"
 #define WKT_PR "../Graph_Data_Storage/wiki_talk_pr.csv"
@@ -147,10 +156,11 @@
 #define WKT_DATA_MEASURE_2 "../RIM_data/wiki_talk/meas_2.csv"
 #define WKT_DATA_MEASURE "../RIM_data/wiki_talk/meas.csv"
 #define WKT_PATH "../Graph_Data_Storage/wiki_talk.csv"
+#define WKT_CSC_PATH "../Graph_Data_Storage/wiki_talk_csc.csv"
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
-#define MAX_WHILE 100 
+#define MAX_WHILE 100
 
 using namespace std;
 
@@ -163,7 +173,7 @@ void readData(string filename, edge* edge_list);
 
 void get_graph_info(string path, unsigned int* nodes, unsigned int* edges);
 
-void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size);
+
 
 
 template <typename idx_t>
@@ -179,6 +189,20 @@ void genCSR(edge* edge_list, idx_t* src, idx_t* succ, unsigned int node_size, un
     }
     copy(src_temp, src_temp+node_size+1, src);
     delete[] src_temp;
+}
+
+template <typename idx_t>
+void genCSC(edge* edge_list, idx_t* csc, idx_t* succ, unsigned int node_size, unsigned int edge_size){
+    unsigned int* csc_temp = new unsigned int[node_size+1]{0};
+    for(unsigned int i = 0; i < edge_size; i++){
+        csc_temp[edge_list[i].dst]++;
+        succ[i] = edge_list[i].src;
+    }
+    csc[0] = 0;
+    for(unsigned int i = 1; i<=node_size; i++){
+        csc[i] = csc[i-1] + csc_temp[i-1];
+    }
+    delete[] csc_temp;
 }
 
 void GenAdj(edge* edge_list, float* adj, unsigned int node_size, unsigned int edge_size);

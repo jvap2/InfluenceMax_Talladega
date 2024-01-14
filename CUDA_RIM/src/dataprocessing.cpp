@@ -73,18 +73,7 @@ void get_graph_info(string path, unsigned int* nodes, unsigned int* edges){
 
 }
 
-void genCSC(edge* edge_list, unsigned int* succ, unsigned int* csc, unsigned int node_size, unsigned int edge_size){
-    unsigned int* csc_temp = new unsigned int[node_size+1]{0};
-    for(unsigned int i = 0; i < edge_size; i++){
-        csc_temp[edge_list[i].dst]++;
-        succ[i] = edge_list[i].src;
-    }
-    csc[0] = 0;
-    for(unsigned int i = 1; i<=node_size; i++){
-        csc[i] = csc[i-1] + csc_temp[i-1];
-    }
-    delete[] csc_temp;
-}
+
 
 
 

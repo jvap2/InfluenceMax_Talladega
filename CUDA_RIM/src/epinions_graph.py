@@ -63,16 +63,25 @@ if __name__ == "__main__":
     # Number of nodes in the seed set
     # Determine the model parameter
     lt_threshold = 0.1
+    no_nodes = g.number_of_nodes()
+    rand_chance = np.arange(no_nodes)
+    np.random.shuffle(rand_chance)
 
+
+    ic_seed_set_size = k
+    rand_seeds = rand_chance[:ic_seed_set_size]
 
     # Run the model
     lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=seeds)
     lt_iterations = lt_model.iteration_bunch(lt_num_steps)
+    rand_lt_model = linear_threshold(graph=g, threshold=lt_threshold, seed_set=rand_seeds)
+    rand_lt_iterations = rand_lt_model.iteration_bunch(lt_num_steps)
 
 
     # Get the number of susceptible, infected and the recovered nodes 
     # in the last step
     print("Final Spread, LT",lt_iterations[-1]["node_count"])
+    print("Final Spread, Rand LT",rand_lt_iterations[-1]["node_count"])
 
     ic_num_steps = 50
     # Number of nodes in the seed set
@@ -84,18 +93,29 @@ if __name__ == "__main__":
     # Run the model
     ic_model_1 = independent_cascade(graph=g, threshold=ic_threshold, seed_set=seeds)
     ic_iterations = ic_model_1.iteration_bunch(ic_num_steps)
+    rand_ic_model = independent_cascade(graph=g, threshold=ic_threshold, seed_set=rand_seeds)
+    rand_ic_iterations = rand_ic_model.iteration_bunch(ic_num_steps)
     spread_1 = []
     for iteration in ic_iterations:
         spread_1.append(iteration['node_count'][1])
     print("Final Spread, Rand RIM, susceptible, infected and the recovered nodes ",ic_iterations[-1]["node_count"])
+    spread_2 = []
+    for iteration in rand_ic_iterations:
+        spread_2.append(iteration['node_count'][1])
+    print("Final Spread, Rand RIM, susceptible, infected and the recovered nodes ",rand_ic_iterations[-1]["node_count"])
 
     percent_lt_spread = lt_iterations[-1]["node_count"][1]/len(g.nodes())
     percent_ic_spread = (ic_iterations[-1]["node_count"][2]+ic_iterations[-1]["node_count"][1])/len(g.nodes())
+
 
     exec_data = pd.read_csv(f)
     test_trial=exec_data.shape[0]
     exec_data.loc[test_trial-1, "percent_LT_RIMR"] = percent_lt_spread
     exec_data.loc[test_trial-1, "percent_IC_RIMR"] = percent_ic_spread
+    exec_data.loc[test_trial-1, "percent_LT_RAND"] = rand_lt_iterations[-1]["node_count"][1]/len(g.nodes())
+    exec_data.loc[test_trial-1, "percent_IC_RAND"] = spread_2[-1]/len(g.nodes())
+    exec_data.loc[test_trial-1,"LT_threshold"] = lt_threshold
+    exec_data.loc[test_trial-1,"IC_threshold"] = ic_threshold
     exec_data.to_csv(f,index=False)
 
 
