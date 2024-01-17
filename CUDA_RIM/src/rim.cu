@@ -256,6 +256,9 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
         std::cout<<"Error freeing rand_idx"<<endl;
     }
     delete[] h_rand_idx;
+    if(!HandleCUDAError(cudaDeviceReset())){
+        std::cout<<"Error resetting device"<<endl;
+    }
 
     for(int i = 0; i<NUMSTRM;i++){
         if(!HandleCUDAError(cudaStreamDestroy(streams[i]))){

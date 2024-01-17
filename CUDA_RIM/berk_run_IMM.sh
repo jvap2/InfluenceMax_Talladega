@@ -1,7 +1,7 @@
 #!/bin/sh
 
-vers=3
-seed_size=100
+vers=7
+seed_size=150
 ep=.5
 data_set=9
 walk=1

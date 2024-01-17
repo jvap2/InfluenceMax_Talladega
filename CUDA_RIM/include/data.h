@@ -32,6 +32,7 @@
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 #include <thrust/extrema.h>
+#include <cusolverDn.h>
 #include "GPUErrors.h"
 
 #define TPB 256

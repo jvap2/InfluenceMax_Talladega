@@ -5,7 +5,7 @@ NVCC := nvcc
 NVCC_FLAGS := --extended-lambda -Xcompiler -O3 -rdc=true -gencode arch=compute_89,code=sm_89
 # NVCC_FLAGS := --extended-lambda -g -G -Xcompiler -Wall -rdc=true -gencode arch=compute_89,code=sm_89
 LINK_FLAGS := -arch=sm_89  
-INC_FLAGS := -lcudadevrt -lcurand -lcusparse -lcublas -lnvToolsExt
+INC_FLAGS := -lcudadevrt -lcurand -lcusparse -lcublas -lnvToolsExt -lcusolver
 # C_FLAGS := -std=c++11 
 
 INC := include
