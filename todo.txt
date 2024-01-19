@@ -21,3 +21,7 @@
 -arxiv is messing up with matrix mult for some reason, it is due to the new pr algorithm
 
 - Possible utilize unsupervised learning Hogwild Style to learn communities, and seed them for influence spread
+
+- Two possible avenues to take next:
+    (1) Partition the graph either randomly or with a proper community detection method, apply rimr
+    (2) Partition the graph into random graphs and apply the percolation optimization
