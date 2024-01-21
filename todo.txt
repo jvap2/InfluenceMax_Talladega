@@ -22,6 +22,10 @@
 
 - Possible utilize unsupervised learning Hogwild Style to learn communities, and seed them for influence spread
 
-- Two possible avenues to take next:
+- Three possible avenues to take next:
     (1) Partition the graph either randomly or with a proper community detection method, apply rimr
     (2) Partition the graph into random graphs and apply the percolation optimization
+    (3) Based on the results of the percolation paper, is it possible to simply perform vertex cuts?
+    (4) What about optimal flow? Is there any way to invert this problem to be minimum flow if specific edges are plucked
+    (5) What about using the idea of finding the expected bounds of max/min flow. Find a way to cheaply precondition
+    a set of nodes to test if they fall in such bounds
