@@ -38,7 +38,7 @@
 #define TPB 256
 #define K 150
 
-#define NUMSTRM 10
+#define NUMSTRM 40
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
@@ -161,7 +161,7 @@
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
-#define MAX_WHILE 100
+#define MAX_WHILE 1000
 
 using namespace std;
 
@@ -240,23 +240,75 @@ __global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* va
         result[t] = sum;
     }
 }
+__device__ float sigmoid(float x);
+
+__device__ float tanh_dev(float x);
+
+__device__ float swish(float x);
 
 
 template <typename IndexType>
 __global__ void sparseCSRMat_Vec_Mult_BFS(IndexType* csc, IndexType* succ, IndexType* visited, float* values, float* vec, float* result, unsigned int node_size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        if(visited[t]){
+            IndexType start = csc[t];
+            IndexType end = csc[t+1];
+            float sum = 0.0f;
+            for(IndexType i = start; i < end; i++){
+                //if it is visted, set it to 0, otherwise, set it to 1
+                sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
+                if(visited[succ[i]])
+                    atomicCAS(&visited[succ[i]], 1, 0);
+                else
+                    atomicCAS(&visited[succ[i]], 0, 1);
+            }
+            result[t] = sum;
+        }
+        else{
+            result[t] = 0.0f;
+        }
+    }
+}
+
+
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult_BFS_Sig(IndexType* csc, IndexType* succ, IndexType* visited, float* values, float* vec, float* result, unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
         IndexType start = csc[t];
         IndexType end = csc[t+1];
         float sum = 0.0f;
+        float temp = 0.0f;
         for(IndexType i = start; i < end; i++){
             //if it is visted, set it to 0, otherwise, set it to 1
-            sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
+            temp = values[i]*vec[succ[i]]*(visited[succ[i]]);
+            sum += sigmoid(temp);
             visited[succ[i]]=visited[succ[i]]==1?(0):(visited[succ[i]]);
         }
         result[t] = sum;
     }
 }
+
+
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult_BFS_Tanh(IndexType* csc, IndexType* succ, IndexType* visited, float* values, float* vec, float* result, unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
+        float sum = 0.0f;
+        float temp = 0.0f;
+        for(IndexType i = start; i < end; i++){
+            //if it is visted, set it to 0, otherwise, set it to 1
+            temp = values[i]*vec[succ[i]]*(visited[succ[i]]);
+            sum += tanh_dev(temp);
+            visited[succ[i]]=visited[succ[i]]==1?(0):(visited[succ[i]]);
+        }
+        result[t] = sum;
+    }
+}
+
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
 
 __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, unsigned int k);
@@ -293,9 +345,11 @@ __host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_si
 
 __host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P, unsigned int node_size, unsigned int edge_size, float damp, string file);
 
+__global__ void Int_PointAdd(int* vec1, int* vec2, unsigned int size);
 
 //Device Functions
 
 __device__ float eval_values(float rand_num, float val,float threshold);
 
 __device__ float eval_values_v2(float rand_num, float val,float threshold);
+

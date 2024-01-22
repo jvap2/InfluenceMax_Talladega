@@ -57,7 +57,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_TANH,HEPTH_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_RPR,HEPTH_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_RPR,HEPTH_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_TANH,WIKI_VOTE_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_RPR,WIKI_VOTE_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_RPR,WIKI_VOTE_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_TANH,ARVIX_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_RPR,ARVIX_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_RPR,ARVIX_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -208,7 +208,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_TANH,HOMO_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_RPR,HOMO_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_RPR,HOMO_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -258,7 +258,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_TANH,EP_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_RPR,EP_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_RPR,EP_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -308,7 +308,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_TANH,AM_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_RPR,AM_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_RPR,AM_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -358,7 +358,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_TANH,ND_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_RPR,ND_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_RPR,ND_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -408,7 +408,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,GGL_DATA_MEASURE_TANH,GGL_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,GGL_DATA_MEASURE_RPR,GGL_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,GGL_DATA_MEASURE_RPR,GGL_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -458,7 +458,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,BRK_DATA_MEASURE_TANH,BRK_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,BRK_DATA_MEASURE_RPR,BRK_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,BRK_DATA_MEASURE_RPR,BRK_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
@@ -508,7 +508,7 @@ int main(int argc, char** argv)
             else if(strcmp(argv[2],"tanh")==0)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,WKT_DATA_MEASURE_TANH,WKT_PR);
             else if(strcmp(argv[2],"rpr")==0)
-                RIM_rand_Ver7_PR_Rand(csr,succ,no_nodes,no_edges,seed_set,WKT_DATA_MEASURE_RPR,WKT_PR);
+                RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,WKT_DATA_MEASURE_RPR,WKT_PR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);

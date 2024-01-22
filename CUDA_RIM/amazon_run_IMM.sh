@@ -1,6 +1,6 @@
 #!/bin/sh
 
-walk=1
+walk=0
 vers=7
 seed_size=150
 ep=.5
