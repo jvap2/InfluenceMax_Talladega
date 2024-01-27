@@ -59,3 +59,24 @@ void printCudaMemoryUsage() {
     printf("GPU memory usage: used = %.2f, free = %.2f MB, total = %.2f MB\n",
         used_db /1024.0/1024.0, free_db /1024.0/1024.0, total_db /1024.0/1024.0);
 }
+
+int Max_Blocks(unsigned int tpb, unsigned int streams){
+	cudaDeviceProp prop;
+    int device;
+    cudaGetDevice(&device);  // Get the current device
+    cudaGetDeviceProperties(&prop, device);  // Get the properties of the device
+	if(streams>prop.multiProcessorCount){
+		cout<<"ERROR: More streams than multiprocessors"<<endl;
+		exit(1);
+	}
+    int maxActiveBlocksPerMultiprocessor = prop.maxThreadsPerMultiProcessor / tpb;
+    int maxActiveBlocks = prop.multiProcessorCount * maxActiveBlocksPerMultiprocessor;
+    int blocks_per_stream = 0;
+	if(streams==1){
+		blocks_per_stream = maxActiveBlocks;
+	}
+	else{
+		blocks_per_stream = maxActiveBlocks/streams;
+	}
+	return blocks_per_stream;
+}

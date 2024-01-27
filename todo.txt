@@ -29,3 +29,4 @@
     (4) What about optimal flow? Is there any way to invert this problem to be minimum flow if specific edges are plucked
     (5) What about using the idea of finding the expected bounds of max/min flow. Find a way to cheaply precondition
     a set of nodes to test if they fall in such bounds
+    (6) Divide by degree?

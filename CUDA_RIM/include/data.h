@@ -161,7 +161,7 @@
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
-#define MAX_WHILE 1000
+#define MAX_WHILE 200
 
 using namespace std;
 
@@ -258,16 +258,28 @@ __global__ void sparseCSRMat_Vec_Mult_BFS(IndexType* csc, IndexType* succ, Index
             for(IndexType i = start; i < end; i++){
                 //if it is visted, set it to 0, otherwise, set it to 1
                 sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
-                if(visited[succ[i]])
-                    atomicCAS(&visited[succ[i]], 1, 0);
-                else
-                    atomicCAS(&visited[succ[i]], 0, 1);
+                visited[succ[i]]=0;
             }
             result[t] = sum;
         }
         else{
             result[t] = 0.0f;
         }
+    }
+}
+
+
+template <typename IndexType>
+__global__ void sparseCSRMat_SparseDiagMat_Mult_BFS(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
+        float sum = 0.0f;
+        for(IndexType i = start; i < end; i++){
+            sum += values[i] * vec[t] * vec[succ[i]];
+        }
+        result[t] = sum;
     }
 }
 
@@ -346,6 +358,8 @@ __host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_si
 __host__ void Gen_Pr_Sprs(unsigned int* csc, unsigned int* succ, float* weight_P, unsigned int node_size, unsigned int edge_size, float damp, string file);
 
 __global__ void Int_PointAdd(int* vec1, int* vec2, unsigned int size);
+
+__global__ void Fill_Diag(float* A, float* diag, unsigned int node_size, unsigned int size);
 
 //Device Functions
 
