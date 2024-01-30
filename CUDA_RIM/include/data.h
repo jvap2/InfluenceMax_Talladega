@@ -361,11 +361,15 @@ __global__ void Int_PointAdd(int* vec1, int* vec2, unsigned int size);
 
 __global__ void Fill_Diag(float* A, float* diag, unsigned int node_size, unsigned int size);
 
-__global__ void Prob_BFS_Score_Kernel(unsigned int* d_csc, unsigned int* d_succ, unsigned int node_size, unsigned int edge_size, float* d_score, unsigned int* d_visited, float threshold);
+__global__ void Prob_BFS_Score_Kernel(unsigned int* d_csc, unsigned int* d_succ, unsigned int node_size, unsigned int edge_size, float* d_score, unsigned int* d_visited,
+unsigned int* frontier, unsigned int* next_frontier, float threshold, int level);
 
+__host__ void Prob_BFS_Score(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
 //Device Functions
 
 __device__ float eval_values(float rand_num, float val,float threshold);
 
 __device__ float eval_values_v2(float rand_num, float val,float threshold);
+
+__device__ float score_function(float threshold);
 

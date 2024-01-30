@@ -359,6 +359,8 @@ int main(int argc, char** argv)
                 RIM_rand_Ver6_Tanh(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_TANH,ND_PR);
             else if(strcmp(argv[2],"rpr")==0)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_RPR,ND_PR);
+            else if(strcmp(argv[2],"bfs")==0)
+                Prob_BFS_Score(csr,succ,no_nodes,no_edges,seed_set,.4f,ND_DATA_MEASURE_RPR);
             else{
                 cout << "Please specify the version" << endl;
                 exit(0);
