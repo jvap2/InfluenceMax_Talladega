@@ -14,4 +14,6 @@ bool GetCUDARunTimeError();//This gets error from the GPU
 bool HandleCUSparseError(cusparseStatus_t t);//This handles the cusparse error
 bool HandleCUBLASError(cublasStatus_t t);//This handles the cublas error
 void printCudaMemoryUsage();
+int Max_Blocks(unsigned int tpb, unsigned int streams);
+void CreateStreams(unsigned int streams,cudaStream_t* stream);
 //Any assignment, use the error handling everytime

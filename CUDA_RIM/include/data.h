@@ -361,6 +361,8 @@ __global__ void Int_PointAdd(int* vec1, int* vec2, unsigned int size);
 
 __global__ void Fill_Diag(float* A, float* diag, unsigned int node_size, unsigned int size);
 
+__global__ void Prob_BFS_Score_Kernel(unsigned int* d_csc, unsigned int* d_succ, unsigned int node_size, unsigned int edge_size, float* d_score, unsigned int* d_visited, float threshold);
+
 //Device Functions
 
 __device__ float eval_values(float rand_num, float val,float threshold);

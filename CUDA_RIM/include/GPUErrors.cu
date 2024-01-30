@@ -80,3 +80,9 @@ int Max_Blocks(unsigned int tpb, unsigned int streams){
 	}
 	return blocks_per_stream;
 }
+
+void CreateStreams(unsigned int streams,cudaStream_t* stream){
+	for(unsigned int i=0;i<streams;i++){
+		cudaStreamCreate(&stream[i]);
+	}
+}

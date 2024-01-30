@@ -2258,13 +2258,33 @@ __host__ void  RIM_rand_Ver9_BFS(unsigned int* csc, unsigned int* succ, unsigned
         std::cout<<"Error copying pr_vector to device"<<endl;
     }
     thrust::transform(thrust::device, d_pr, d_pr+node_size, d_pr, [] __device__ (float x) { return 1-x; });
+    float sum = thrust::reduce(thrust::device, d_pr, d_pr+node_size);
+    float temp = sum;
+    thrust::transform(thrust::device, d_pr, d_pr+node_size, d_pr, [=] __device__ (float x) { return x/temp; });
     //Use managed memory to create a diagonal matrix with the pr values along the diagonal
     float* d_mat;
     if(!HandleCUDAError(cudaMallocManaged((void**)&d_mat, sizeof(float)*node_size*node_size))){
         std::cout<<"Error allocating memory for d_diag"<<endl;
     }
     unsigned int mat_size = node_size*node_size;
-    
+    int maximum_blocks_fill_mat = Max_Blocks(TPB,1);
+    int blocks_fill_mat = mat_size/TPB+1;
+    if(blocks_fill_mat > maximum_blocks_fill_mat){
+        blocks_fill_mat = maximum_blocks_fill_mat;
+    }
+    Fill_Diag<<<blocks_fill_mat, TPB>>>(d_mat, d_pr, node_size,mat_size);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        std::cout<<"Error synchronizing device"<<endl;
+    }
+    //Now, we will perform the BFS on the graph
+    unsigned int* d_csc;
+    unsigned int* d_succ;
+    float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
+    float* d_res;
+    //First we will try without multiple streams
+
+
+
 
 }
 
@@ -2487,3 +2507,4 @@ __global__ void Fill_Diag(float* A, float* diag, unsigned int node_size, unsigne
         A[idx]= diag[tid];
     }
 }
+
