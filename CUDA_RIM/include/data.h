@@ -240,6 +240,21 @@ __global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* va
         result[t] = sum;
     }
 }
+
+
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, float threshold,unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
+        float sum = 0.0f;
+        for(IndexType i = start; i < end; i++){
+            sum += values[i]*vec[succ[i]];
+        }
+        result[t] = exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1))*sum;
+    }
+}
 __device__ float sigmoid(float x);
 
 __device__ float tanh_dev(float x);
@@ -348,6 +363,8 @@ __host__ void  RIM_rand_Ver6_Tanh(unsigned int* csc, unsigned int* succ, unsigne
 __host__ void  RIM_rand_Ver7_PR_Rand(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
 __host__ void  RIM_rand_Ver9_BFS(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
+
+__host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
 
 __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 

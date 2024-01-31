@@ -237,8 +237,7 @@ unsigned int* frontier, unsigned int* next_frontier, float threshold, int level)
 
 
 
-__host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file){
-    float threshold = .3;
+__host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file){
     float damping_factor =.3;
     cudaDeviceProp prop;
     int device;
@@ -256,7 +255,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
             std::cout<<"Error creating stream number "<<i<<endl;
         }
     }
-    unsigned int num_walker = node_size/20;
+    unsigned int num_walker = 1;
     unsigned int epochs=30;
     unsigned int* d_csc;
     unsigned int* d_succ;
@@ -352,90 +351,40 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     float tol_thresh=1e-6;
     for(int i = 0; i < epochs; i++){
         std::cout<<"Epoch "<<i<<endl;
-        thrust::fill(tol,tol+NUMSTRM, 100.0f);
         int while_count = 0;
         while_count=0;
         srand(time(0));
         int rand_seed = rand();
         curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
         curandGenerateUniform(gen, rand_init, num_walker*NUMSTRM);
-        for(int i = 0; i < NUMSTRM; i++){
+        for(int j = 0; j < NUMSTRM; j++){
             //Initialize the random vector
-            float* rand_init_i = rand_init + i*num_walker;
-            float* rand_vec_init_i = rand_vec_init + i*node_size;
-            Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
-            if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-                std::cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
+            float* rand_init_i = rand_init + j*num_walker;
+            float* rand_vec_init_i = rand_vec_init + j*node_size;
+            Init_Random<<<blocks_per_stream, TPB,0,streams[j]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
+            if(!HandleCUDAError(cudaStreamSynchronize(streams[j]))){
+                std::cout<<"Error synchronizing device at Init Random for Stream "<<j<<endl;
             }
-
-            float* rand_numbers_i = rand_numbers + i*edge_size;
-            float* d_values_i = d_values + i*edge_size;
-            curandGenerator_t gen;
-            curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-            srand(time(0));
-            int rand_seed = rand();
-            curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
-            curandGenerateUniform(gen, rand_numbers_i, edge_size);
-            curandDestroyGenerator(gen);
-            thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values(x,y,threshold); });
         }
         bool check = true;
-        while(check && while_count < MAX_WHILE){
+        while(while_count < MAX_WHILE){
             while_count++;
-            for(int i = 0; i < NUMSTRM; i++){
+            for(int j = 0; j < NUMSTRM; j++){
                 //Perform the first iteration of the algorithm
-                if(tol[i] > threshold){
-                    float* rand_vec_init_i = rand_vec_init + i*node_size;
-                    float* d_res_i = d_res + i*node_size;
-                    float* d_values_i = d_values + i*edge_size;
-                    sparseCSRMat_Vec_Mult<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, node_size);  
-                    if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-                        std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
-                    }
-                }
-            }
-            for(int i = 0; i < NUMSTRM; i++){
-                // Add 1/n to the vector
-                if(tol[i] > threshold){
-                    float* d_res_i = d_res + i*node_size;
-                    float* d_vec_i = d_vec + i*node_size;
-                    float* rand_vec_init_i = rand_vec_init + i*node_size;
-                    float* store_stream_res_i = store_stream_res + i*node_size;
-                    Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(d_res_i,d_vec_i, node_size);
-                    if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-                        std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
-                    }
-                    //Need to normalize the vector using thrust library
-
-                    l2_norm_d_res[i] = thrust::transform_reduce(thrust::device.on(streams[i]), d_res_i, d_res_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
-                    l2_norm_d_res[i] = sqrt(l2_norm_d_res[i]);
-
-                    l2_norm_rand_vec_init[i] = thrust::transform_reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i + node_size, [] __device__ (float x) { return x * x; }, 0.0f, thrust::plus<float>());
-                    l2_norm_rand_vec_init[i] = sqrt(l2_norm_rand_vec_init[i]);
-
-                    tol[i] = abs(l2_norm_d_res[i]-l2_norm_rand_vec_init[i]);
-                    thrust::copy(thrust::device.on(streams[i]), d_res_i, d_res_i+node_size, rand_vec_init_i);
-
-
-                    sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size);
-                    float temp = sum[i];
-                    thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, rand_vec_init_i, [=] __device__ (float x) { return x/temp; });
-                    Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(store_stream_res_i,rand_vec_init_i, node_size);
-                    if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-                        std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
-                    }
-                    // thrust::fill(thrust::device.on(streams[i]), d_vec, d_vec+node_size, 1.0f/node_size);
-                }
-            }
-            check = false;
-            for(int i=0;i<NUMSTRM;i++){
-                if(tol[i] > tol_thresh){
-                    check = true;
+                float* rand_vec_init_i = rand_vec_init + j*node_size;
+                float* d_res_i = d_res + j*node_size;
+                float* d_values_i = d_values + j*edge_size;
+                sparseCSRMat_Vec_Mult_Mart_BFS<unsigned int><<<blocks_per_stream, TPB,0,streams[j]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, threshold, node_size);  
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[j]))){
+                    std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                 }
             }
         }
-        for(int i = 0; i<NUMSTRM;i++){
-            thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+(i+1)*edge_size, 1.0f);
+        for(int j = 0; j < NUMSTRM; j++){
+            float* d_res_i = d_res + j*node_size;
+            float* store_stream_res_i = store_stream_res + j*node_size;
+            thrust::transform(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, store_stream_res_i, store_stream_res_i, thrust::plus<float>());
+            thrust::fill(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, 0.0f);
         }
     }
     cudaEventRecord(stop);
