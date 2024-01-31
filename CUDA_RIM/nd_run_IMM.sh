@@ -23,6 +23,8 @@ elif [ "$vers" -eq 6 ]; then
     name=tanh
 elif [ $vers -eq 7 ]; then
     name=rpr
+elif [ $vers -eq 7 ]; then
+    name=bfs
 else
     echo "invalid option"
 fi

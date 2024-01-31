@@ -38,7 +38,7 @@
 #define TPB 256
 #define K 150
 
-#define NUMSTRM 40
+#define NUMSTRM 6
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
@@ -371,5 +371,5 @@ __device__ float eval_values(float rand_num, float val,float threshold);
 
 __device__ float eval_values_v2(float rand_num, float val,float threshold);
 
-__device__ float score_function(float threshold);
+
 
