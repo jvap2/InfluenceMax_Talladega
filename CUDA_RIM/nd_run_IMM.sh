@@ -1,10 +1,10 @@
 #!/bin/sh
 
-vers=7
+vers=8
 seed_size=150
 ep=.5
 data_set=7
-walk=0
+walk=1
 
 
 # for vers in 2 3 4 5 6 7
@@ -23,7 +23,7 @@ elif [ "$vers" -eq 6 ]; then
     name=tanh
 elif [ $vers -eq 7 ]; then
     name=rpr
-elif [ $vers -eq 7 ]; then
+elif [ $vers -eq 8 ]; then
     name=bfs
 else
     echo "invalid option"

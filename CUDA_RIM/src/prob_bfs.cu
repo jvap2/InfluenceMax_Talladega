@@ -256,11 +256,11 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
         }
     }
     unsigned int num_walker = 1;
-    unsigned int epochs=30;
     unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
     float* d_res;
+    float* d_accum_res;
     float* vec = new float[NUMSTRM*node_size];
     float* values = new float[NUMSTRM*edge_size];
     float* res = new float[NUMSTRM*node_size]; 
@@ -285,6 +285,9 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     if(!HandleCUDAError(cudaMalloc((void**)&d_res, sizeof(float)*node_size*NUMSTRM))){
         std::cout<<"Error allocating memory for d_res"<<endl;
     }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_accum_res, sizeof(float)*node_size*NUMSTRM))){
+        std::cout<<"Error allocating memory for d_accum_res"<<endl;
+    }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*node_size, cudaMemcpyHostToDevice))){
         std::cout<<"Error copying csc to device"<<endl;
     }
@@ -300,7 +303,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     }
     delete[] res;
 
-    
+    thrust::fill(thrust::device,d_accum_res,d_accum_res+node_size*NUMSTRM,0.0f);
     float* d_values;
     if(!HandleCUDAError(cudaMalloc((void**)&d_values, sizeof(float)*(edge_size*NUMSTRM)))){
         std::cout<<"Error allocating memory for d_values"<<endl;
@@ -349,8 +352,9 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     cudaEventCreate(&stop);
     cudaEventRecord(start);
     float tol_thresh=1e-6;
+    unsigned int epochs = K/NUMSTRM+1;
     for(int i = 0; i < epochs; i++){
-        std::cout<<"Epoch "<<i<<endl;
+        // std::cout<<"Epoch "<<i<<endl;
         int while_count = 0;
         while_count=0;
         srand(time(0));
@@ -374,14 +378,18 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
                 float* rand_vec_init_i = rand_vec_init + j*node_size;
                 float* d_res_i = d_res + j*node_size;
                 float* d_values_i = d_values + j*edge_size;
+                float* d_accum_res_i = d_accum_res + j*node_size;
                 sparseCSRMat_Vec_Mult_Mart_BFS<unsigned int><<<blocks_per_stream, TPB,0,streams[j]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, threshold, node_size);  
                 if(!HandleCUDAError(cudaStreamSynchronize(streams[j]))){
                     std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                 }
+                thrust::copy(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, rand_vec_init_i);
+                thrust::transform(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, d_accum_res_i,d_accum_res_i, thrust::plus<float>());
+                thrust::fill(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, 0.0f);
             }
         }
         for(int j = 0; j < NUMSTRM; j++){
-            float* d_res_i = d_res + j*node_size;
+            float* d_res_i = d_accum_res + j*node_size;
             float* store_stream_res_i = store_stream_res + j*node_size;
             thrust::transform(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, store_stream_res_i, store_stream_res_i, thrust::plus<float>());
             thrust::fill(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, 0.0f);
@@ -432,7 +440,14 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
         std::cout<<"Error freeing rand_idx"<<endl;
     }
     delete[] h_rand_idx;
-
+    float* check = new float[node_size];
+    if(!HandleCUDAError(cudaMemcpy(check, store_stream_res, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
+        std::cout<<"Error copying store_stream_res to host"<<endl;
+    }
+    for(int i = 0; i < K; i++){
+        cout<<seed_set[i]<<endl;
+        cout<<check[i]<<endl;
+    }
     for(int i = 0; i<NUMSTRM;i++){
         if(!HandleCUDAError(cudaStreamDestroy(streams[i]))){
             std::cout<<"Error destroying stream number "<<i<<endl;

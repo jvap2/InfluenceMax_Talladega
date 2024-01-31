@@ -12,6 +12,7 @@ meas_4 = "../../RIM_data/wiki_talk/meas_4.csv"
 meas_5 = "../../RIM_data/wiki_talk/meas_5.csv"
 meas_6 = "../../RIM_data/wiki_talk/meas_6.csv"
 meas_7 = "../../RIM_data/wiki_talk/meas_7.csv"
+meas_8 = "../../RIM_data/wiki_talk/meas_8.csv"
 
 ver = int(sys.argv[1])
 k = int(sys.argv[2])
@@ -31,6 +32,8 @@ elif ver == 6:
     f = meas_6
 elif ver == 7:
     f = meas_7
+elif ver == 8:
+    f = meas_8
 else:
     print("Wrong version number")
     sys.exit(1)

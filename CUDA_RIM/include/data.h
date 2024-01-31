@@ -124,7 +124,7 @@
 #define ND_DATA_MEASURE_SIG "../RIM_data/nd/meas_5.csv"
 #define ND_DATA_MEASURE_TANH "../RIM_data/nd/meas_6.csv"
 #define ND_DATA_MEASURE_RPR "../RIM_data/nd/meas_7.csv"
-#define ND_DATA_MEASURE_RPR "../RIM_data/nd/meas_8.csv"
+#define ND_DATA_MEASURE_BFS "../RIM_data/nd/meas_8.csv"
 #define ND_DATA_MEASURE_PR "../RIM_data/nd/meas_3.csv"
 #define ND_DATA_MEASURE_2 "../RIM_data/nd/meas_2.csv"
 #define ND_DATA_MEASURE "../RIM_data/nd/meas.csv"
@@ -172,7 +172,7 @@
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
-#define MAX_WHILE 200
+#define MAX_WHILE 50
 
 using namespace std;
 

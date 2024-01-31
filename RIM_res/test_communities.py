@@ -24,6 +24,8 @@ if vers ==2:
         time_file = "../RIM_data/arvix/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/arvix/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/arvix/meas_8.csv"
 if vers ==3:
     File = "../Graph_Data_Storage/ca-HepTh.txt"
     top = pd.read_csv("res_hepth.csv").to_numpy().flatten()
@@ -43,6 +45,8 @@ if vers ==3:
         time_file = "../RIM_data/HepTh/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/HepTh/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/HepTh/meas_8.csv"
 if vers ==4:
     File = "../Graph_Data_Storage/wiki-Vote.txt"
     top = pd.read_csv("res_wiki.csv").to_numpy().flatten()
@@ -62,6 +66,8 @@ if vers ==4:
         time_file = "../RIM_data/wiki-vote/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/wiki-vote/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/wiki-vote/meas_8.csv"
 if vers ==5:
     File = "../Graph_Data_Storage/soc-Epinions1.txt"
     top = pd.read_csv("res_ep.csv").to_numpy().flatten()
@@ -81,6 +87,8 @@ if vers ==5:
         time_file = "../RIM_data/epinions/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/epinions/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/epinions/meas_8.csv"
 if vers ==6:
     File = "../Graph_Data_Storage/amazon0302.txt"
     top = pd.read_csv("res_amazon.csv").to_numpy().flatten()
@@ -100,6 +108,8 @@ if vers ==6:
         time_file = "../RIM_data/amazon/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/amazon/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/amazon/meas_8.csv"
 if vers == 7:
     File = "../Graph_Data_Storage/web-NotreDame.txt"
     top = pd.read_csv("res_nd.csv").to_numpy().flatten()
@@ -119,6 +129,8 @@ if vers == 7:
         time_file = "../RIM_data/nd/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/nd/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/nd/meas_8.csv"
 if vers ==8:
     File ="../Graph_Data_Storage/web-Google.txt"
     top = pd.read_csv("res_google.csv").to_numpy().flatten()
@@ -138,6 +150,8 @@ if vers ==8:
         time_file = "../RIM_data/google/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/google/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/google/meas_8.csv"
 if vers ==9:
     File = "../Graph_Data_Storage/web-BerkStan.txt"
     top = pd.read_csv("res_berk_new.csv").to_numpy().flatten()
@@ -157,6 +171,8 @@ if vers ==9:
         time_file = "../RIM_data/berk/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/berk/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/berk/meas_8.csv"
 if vers ==10:
     File = "../Graph_Data_Storage/wiki-Talk.txt"
     top = pd.read_csv("res_wiki_talk.csv").to_numpy().flatten()
@@ -176,6 +192,8 @@ if vers ==10:
         time_file = "../RIM_data/wiki_talk/meas_6.csv"
     elif rim_vers==7:
         time_file = "../RIM_data/wiki_talk/meas_7.csv"
+    elif rim_vers==8:
+        time_file = "../RIM_data/wiki_talk/meas_8.csv"
 
 g = nx.read_edgelist(
     File,
