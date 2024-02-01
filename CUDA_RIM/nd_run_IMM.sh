@@ -4,7 +4,7 @@ vers=8
 seed_size=150
 ep=.5
 data_set=7
-walk=1
+walk=0
 
 
 # for vers in 2 3 4 5 6 7

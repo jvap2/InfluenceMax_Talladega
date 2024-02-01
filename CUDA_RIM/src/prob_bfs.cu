@@ -256,11 +256,11 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
         }
     }
     unsigned int num_walker = 1;
+    unsigned int epochs=30;
     unsigned int* d_csc;
     unsigned int* d_succ;
     float* d_vec; //we will use the seed set as the PR vector and then transfer the top k to the actual seed set
     float* d_res;
-    float* d_accum_res;
     float* vec = new float[NUMSTRM*node_size];
     float* values = new float[NUMSTRM*edge_size];
     float* res = new float[NUMSTRM*node_size]; 
@@ -273,6 +273,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     thrust::fill(res, res+NUMSTRM*node_size, 0.0f);
     thrust::fill(vec, vec+NUMSTRM*node_size, 1.0f/node_size);
     thrust::fill(values, values+NUMSTRM*edge_size, 1.0f);
+    bool* d_check;
     if(!HandleCUDAError(cudaMalloc((void**)&d_csc, sizeof(unsigned int)*(node_size+1)))){
         std::cout<<"Error allocating memory for d_csc"<<endl;
     }
@@ -285,8 +286,8 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     if(!HandleCUDAError(cudaMalloc((void**)&d_res, sizeof(float)*node_size*NUMSTRM))){
         std::cout<<"Error allocating memory for d_res"<<endl;
     }
-    if(!HandleCUDAError(cudaMalloc((void**)&d_accum_res, sizeof(float)*node_size*NUMSTRM))){
-        std::cout<<"Error allocating memory for d_accum_res"<<endl;
+    if(!HandleCUDAError(cudaMalloc((void**)&d_check, sizeof(bool)*NUMSTRM*node_size))){
+        std::cout<<"Error allocating memory for d_check"<<endl;
     }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*node_size, cudaMemcpyHostToDevice))){
         std::cout<<"Error copying csc to device"<<endl;
@@ -303,7 +304,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     }
     delete[] res;
 
-    thrust::fill(thrust::device,d_accum_res,d_accum_res+node_size*NUMSTRM,0.0f);
+    
     float* d_values;
     if(!HandleCUDAError(cudaMalloc((void**)&d_values, sizeof(float)*(edge_size*NUMSTRM)))){
         std::cout<<"Error allocating memory for d_values"<<endl;
@@ -323,13 +324,18 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
 
     /*Now, we have the random numbers generated*/
     float* rand_vec_init;
+    bool* check = new bool[NUMSTRM*node_size];
     float* h_rand_vec_init = new float[node_size*NUMSTRM];
     thrust::fill(h_rand_vec_init, h_rand_vec_init+node_size*NUMSTRM, 0.0f);
+    thrust::fill(check, check+NUMSTRM*node_size, false);
     if(!HandleCUDAError(cudaMalloc((void**)&rand_vec_init, sizeof(float)*node_size*NUMSTRM))){
         std::cout<<"Error allocating memory for rand_vec_init"<<endl;
     } 
     if(!HandleCUDAError(cudaMemcpy(rand_vec_init, h_rand_vec_init, sizeof(float)*node_size*NUMSTRM, cudaMemcpyHostToDevice))){
         std::cout<<"Error copying h_rand_vec_init to device"<<endl;
+    }
+    if(!HandleCUDAError(cudaMemcpy(d_check, check, sizeof(bool)*NUMSTRM*node_size, cudaMemcpyHostToDevice))){
+        std::cout<<"Error copying check to device"<<endl;
     }
 
     float* store_stream_res;
@@ -351,48 +357,65 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start);
-    float tol_thresh=1e-6;
-    unsigned int epochs = K/NUMSTRM+1;
-    for(int i = 0; i < epochs; i++){
-        // std::cout<<"Epoch "<<i<<endl;
+    float tol_thresh=.95;
+    for(int k = 0; k < epochs; k++){
+        // std::cout<<"Epoch "<<k<<endl;
+        thrust::fill(tol,tol+NUMSTRM, 100.0f);
         int while_count = 0;
         while_count=0;
         srand(time(0));
         int rand_seed = rand();
         curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
         curandGenerateUniform(gen, rand_init, num_walker*NUMSTRM);
-        for(int j = 0; j < NUMSTRM; j++){
+        for(int i = 0; i < NUMSTRM; i++){
             //Initialize the random vector
-            float* rand_init_i = rand_init + j*num_walker;
-            float* rand_vec_init_i = rand_vec_init + j*node_size;
-            Init_Random<<<blocks_per_stream, TPB,0,streams[j]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
-            if(!HandleCUDAError(cudaStreamSynchronize(streams[j]))){
-                std::cout<<"Error synchronizing device at Init Random for Stream "<<j<<endl;
+            float* rand_init_i = rand_init + i*num_walker;
+            float* rand_vec_init_i = rand_vec_init + i*node_size;
+            Init_Random<<<blocks_per_stream, TPB,0,streams[i]>>>(rand_vec_init_i, rand_init_i, node_size, num_walker);
+            if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                std::cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
             }
         }
         bool check = true;
-        while(while_count < MAX_WHILE){
+        while(check && while_count < MAX_WHILE){
             while_count++;
-            for(int j = 0; j < NUMSTRM; j++){
+            float level_thresh = exp(-while_count*(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
+            for(int i = 0; i < NUMSTRM; i++){
                 //Perform the first iteration of the algorithm
-                float* rand_vec_init_i = rand_vec_init + j*node_size;
-                float* d_res_i = d_res + j*node_size;
-                float* d_values_i = d_values + j*edge_size;
-                float* d_accum_res_i = d_accum_res + j*node_size;
-                sparseCSRMat_Vec_Mult_Mart_BFS<unsigned int><<<blocks_per_stream, TPB,0,streams[j]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i, threshold, node_size);  
-                if(!HandleCUDAError(cudaStreamSynchronize(streams[j]))){
+                float* rand_vec_init_i = rand_vec_init + i*node_size;
+                float* d_res_i = d_res + i*node_size;
+                float* d_values_i = d_values + i*edge_size;
+                bool* d_check_i = d_check + i*node_size;
+                sparseCSRMat_Vec_Mult_Mart_BFS<unsigned int><<<blocks_per_stream, TPB,0,streams[i]>>>(d_csc, d_succ, d_values_i, rand_vec_init_i, d_res_i,threshold, node_size);  
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                     std::cout<<"Error synchronizing device at sparseCSRMat_Vec_Mult for stream "<<i<<endl;
                 }
-                thrust::copy(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, rand_vec_init_i);
-                thrust::transform(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, d_accum_res_i,d_accum_res_i, thrust::plus<float>());
-                thrust::fill(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, 0.0f);
+                thrust::copy(thrust::device.on(streams[i]), d_res_i, d_res_i+node_size, rand_vec_init_i);
+                thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, d_check_i, [=] __device__ (float x) { return x>=0; });
+                sum[i] = thrust::reduce(thrust::device.on(streams[i]), d_check_i, d_check_i+node_size);
+                tol[i] = sum[i]/node_size;
+                cout<<"tol["<<i<<"]: "<<tol[i]<<endl;
+                cout<<"sum["<<i<<"]: "<<sum[i]<<endl;
+            }
+            check = false;
+            for(int i=0;i<NUMSTRM;i++){
+                if(tol[i] < tol_thresh){
+                    check = true;
+                }
             }
         }
-        for(int j = 0; j < NUMSTRM; j++){
-            float* d_res_i = d_accum_res + j*node_size;
-            float* store_stream_res_i = store_stream_res + j*node_size;
-            thrust::transform(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, store_stream_res_i, store_stream_res_i, thrust::plus<float>());
-            thrust::fill(thrust::device.on(streams[j]), d_res_i, d_res_i + node_size, 0.0f);
+        for(int i = 0; i<NUMSTRM;i++){
+            float* rand_vec_init_i = rand_vec_init + i*node_size;
+            float* store_stream_res_i = store_stream_res + i*node_size;
+            //Take the softmax of rand_vec_init_i
+            sum[i] = thrust::reduce(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size);
+            float temp = sum[i];
+            thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, rand_vec_init_i, [=] __device__ (float x) { return x/temp; });
+            Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(store_stream_res_i,rand_vec_init_i, node_size);
+            if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+            }
+            thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+(i+1)*edge_size, 1.0f);
         }
     }
     cudaEventRecord(stop);
@@ -430,6 +453,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     }
     thrust::sort_by_key(thrust::device, store_stream_res, store_stream_res+node_size, rand_idx, thrust::greater<float>());
     //Get the top k indexes
+    
     if(!HandleCUDAError(cudaMemcpy(h_rand_idx, rand_idx, sizeof(unsigned int)*K, cudaMemcpyDeviceToHost))){
         std::cout<<"Error copying rand_idx to host"<<endl;
     }
@@ -440,14 +464,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
         std::cout<<"Error freeing rand_idx"<<endl;
     }
     delete[] h_rand_idx;
-    float* check = new float[node_size];
-    if(!HandleCUDAError(cudaMemcpy(check, store_stream_res, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
-        std::cout<<"Error copying store_stream_res to host"<<endl;
-    }
-    for(int i = 0; i < K; i++){
-        cout<<seed_set[i]<<endl;
-        cout<<check[i]<<endl;
-    }
+
     for(int i = 0; i<NUMSTRM;i++){
         if(!HandleCUDAError(cudaStreamDestroy(streams[i]))){
             std::cout<<"Error destroying stream number "<<i<<endl;
@@ -474,6 +491,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     delete[] sum;
     delete[] tol;
     delete[] values;
+
 }
 
 

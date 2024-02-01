@@ -172,7 +172,7 @@
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
-#define MAX_WHILE 50
+#define MAX_WHILE 100
 
 using namespace std;
 
@@ -263,7 +263,8 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
         for(IndexType i = start; i < end; i++){
             sum += values[i]*vec[succ[i]];
         }
-        result[t] = exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1))*sum;
+        sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
+        result[t] = sum;
     }
 }
 __device__ float sigmoid(float x);
