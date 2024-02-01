@@ -254,7 +254,7 @@ __global__ void sparseCSRMat_Vec_Mult(IndexType* csc, IndexType* succ, float* va
 
 
 template <typename IndexType>
-__global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, float threshold,unsigned int node_size){
+__global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int* visited, float threshold,unsigned int node_size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
         IndexType start = csc[t];
@@ -264,7 +264,10 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
             sum += values[i]*vec[succ[i]];
         }
         sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
-        result[t] = sum;
+        if(visited[t]==0 && sum>0){
+            result[t] = sum;
+            visited[t] =1;
+        }
     }
 }
 __device__ float sigmoid(float x);
@@ -348,6 +351,10 @@ __global__ void sparseCSRMat_Vec_Mult_BFS_Tanh(IndexType* csc, IndexType* succ, 
     }
 }
 
+
+template <typename T>
+__global__ void Copy(T* d_res, T* d_vec, unsigned int node_size);
+
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size);
 
 __global__ void Init_Random(float* vec, float* rand_init, unsigned int size, unsigned int k);
@@ -395,6 +402,8 @@ unsigned int* frontier, unsigned int* next_frontier, float threshold, int level)
 
 __host__ void Prob_BFS_Score(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
 //Device Functions
+
+__global__ void Transform_Bool(float* d_res, unsigned int* d_vec, unsigned int node_size);
 
 __device__ float eval_values(float rand_num, float val,float threshold);
 

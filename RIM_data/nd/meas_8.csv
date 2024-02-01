@@ -1,2 +1,2 @@
 streams,time(ms),damping_factor,threshold,epochs,K,steps,percent_IC_CU,percent_LT_CU,time_cu_lt,time_cu_ic,l,eps,percent_LT_RIMR,percent_IC_RIMR,percent_LT_over,percent_IC_over,speedup_LT,speedup_IC,rimr_dist,ic_dist,lt_dist,percent_LT_RAND,percent_IC_RAND,LT_threshold,IC_threshold,dir
-6,2676.71,0.3,0.5,30,150,100
+6,6492.48,0.3,0.5,780,150,1006,6631.65,0.3,0.5,780,150,100
