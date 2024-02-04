@@ -28,6 +28,27 @@ __host__ void Save_Data(string file, float time, float damping_factor, float thr
     myfile.close();
 }
 
+__host__ void Export_Counts(string file, unsigned int* count,unsigned int* idx, unsigned int node_size){
+    ofstream myfile;
+    myfile.open(file);
+    for(int i = 0; i < node_size; i++){
+        myfile<<count[i]<<","<<idx[i]<<"\n";
+    }
+    myfile<<endl;
+    myfile.close();
+}
+
+__host__ void Export_Scores(string file, float* scores, unsigned int* idx, unsigned int node_size){
+    ofstream myfile;
+    myfile.open(file);
+    for(int i = 0; i < node_size; i++){
+        myfile<<scores[i]<<","<<idx[i]<<"\n";
+    }
+    myfile<<endl;
+    myfile.close();
+}
+
+
 __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file){
     float threshold = .2;
     float damping_factor =.3;
@@ -2483,12 +2504,26 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int start = csc[int_idx];
         unsigned int end = (int_idx+1 < node_size) ? csc[int_idx+1] : start;
         for(int i = start; i < end; i++){
-            values[i]*=.25;
-            unsigned int succ_idx = succ[i];
-            unsigned int start_succ = csc[succ_idx];
-            unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
-            for(int j = start_succ; j < end_succ; j++){
-                values[j]*=.5;
+            values[i]*=.5;
+            // unsigned int succ_idx = succ[i];
+            // unsigned int start_succ = csc[succ_idx];
+            // unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
+            // for(int j = start_succ; j < end_succ; j++){
+            //     values[j]*=.5;
+            // }
+        }
+    }
+}
+
+
+__global__ void Zero_Cols_Max_Idx(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int edge_size, unsigned int num_cancel){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int i = tid; i<edge_size; i+=blockDim.x*gridDim.x){
+        unsigned int int_idx = succ[i];
+        for(int j = 0; j < num_cancel; j++){
+            if(idx[j] == int_idx){
+                values[i] *= 0.5f;
+                break;
             }
         }
     }

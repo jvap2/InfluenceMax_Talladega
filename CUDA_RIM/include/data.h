@@ -172,6 +172,10 @@
 #define WKT_DATA_PATH "../Graph_Data_Storage/wiki_talk-data.csv"
 #define WKT_SEED_PATH "../RIM_res/res_wiki_talk.csv"
 
+#define COUNT_PATH "../RIM_res/count.csv"
+#define SCORE_PATH "../RIM_res/score.csv"
+
+
 #define MAX_WHILE 100
 
 using namespace std;
@@ -289,6 +293,8 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS_v2(IndexType* csc, IndexType* suc
     }
 }
 
+__global__ void Zero_Cols_Max_Idx(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int edge_size, unsigned int num_cancel);
+
 __device__ float sigmoid(float x);
 
 __device__ float tanh_dev(float x);
@@ -386,6 +392,8 @@ __host__ void PageRank(float* pr_vector, unsigned int* global_src, unsigned int*
 
 __host__ void PageRank_Sparse(float* pr_vector, float damp, unsigned int node_size, unsigned int edge_size, unsigned int max_iter, float tol, float* time, string pr_file);
 
+__host__ void Export_Counts(string file, unsigned int* count,unsigned int* idx, unsigned int node_size);
+
 __global__ void Init_Pr(float* pr_vector, unsigned int node_size);
 
 __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* succ, unsigned int node_size, float* damp);
@@ -427,6 +435,8 @@ __host__ void Prob_BFS_Score(unsigned int* csc, unsigned int* succ, unsigned int
 
 __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 //Device Functions
+
+__host__ void Export_Scores(string file, float* scores, unsigned int* idx, unsigned int node_size);
 
 __global__ void Transform_Bool(float* d_res, unsigned int* d_vec, unsigned int node_size);
 
