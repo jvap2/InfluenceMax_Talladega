@@ -572,6 +572,7 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
     float* l2_norm_d_res = new float[NUMSTRM];
     float* l2_norm_rand_vec_init = new float[NUMSTRM];
     float* d_penality;
+    float* d_values_temp;
     unsigned int* max_index = new unsigned int[NUMSTRM]; 
     float* penalty_sum = new float[NUMSTRM];
     thrust::fill(count, count+node_size, 0);
@@ -607,6 +608,9 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_max, sizeof(unsigned int)*NUMSTRM))){
         std::cout<<"Error allocating memory for d_max"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_values_temp, sizeof(float)*edge_size*NUMSTRM))){
+        std::cout<<"Error allocating memory for d_values_temp"<<endl;
     }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*node_size, cudaMemcpyHostToDevice))){
         std::cout<<"Error copying csc to device"<<endl;
@@ -673,9 +677,10 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
     cudaEventCreate(&stop);
     cudaEventRecord(start);
     float tol_thresh=1;
-    epochs = 30*(K/NUMSTRM+1);
+    epochs = 100*(K/NUMSTRM+1);
     for(int i = 0; i<NUMSTRM;i++){
         thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+i*edge_size+edge_size, 1.0f);
+        thrust::fill(thrust::device.on(streams[i]), d_values_temp+i*edge_size, d_values_temp+i*edge_size+edge_size, 1.0f);
     }
     for(int k = 0; k < epochs; k++){
         // std::cout<<"Epoch "<<k<<endl;
@@ -701,9 +706,20 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
             if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                 std::cout<<"Error synchronizing device at Init Random for Stream "<<i<<endl;
             }
+            float* rand_numbers_i = rand_numbers + i*edge_size;
+            float* d_values_i = d_values + i*edge_size;
+            curandGenerator_t gen;
+            curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+            srand(time(0));
+            int rand_seed = rand();
+            curandSetPseudoRandomGeneratorSeed(gen, rand_seed);
+            curandGenerateUniform(gen, rand_numbers_i, edge_size);
+            curandDestroyGenerator(gen);
+            thrust::copy(thrust::device.on(streams[i]), d_values_temp+i*edge_size, d_values_temp+i*edge_size+edge_size, d_values+i*edge_size);
+            thrust::transform(thrust::device.on(streams[i]), rand_numbers_i, rand_numbers_i+edge_size, d_values_i, d_values_i, [threshold] __device__ (float x, float y) { return eval_values_v2(x,y,threshold); });
         }
         bool check = true;
-        while(check && while_count < MAX_WHILE){
+        while(check){
             while_count++;
             // cout<<"While count: "<<while_count<<endl;
             float level_thresh = exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
@@ -786,8 +802,8 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
             std::cout<<"Error copying max_index to device"<<endl;
         }
         for(int i=0; i<NUMSTRM;i++){
-            float* d_values_i = d_values + i*edge_size;
-            Zero_Rows_Max_Idx<<<blocks_per_stream, TPB,0,streams[i]>>>(d_values_i,d_csc,d_succ,d_max,node_size,NUMSTRM);
+            float* d_values_temp_i = d_values_temp + i*edge_size;
+            Zero_Rows_Max_Idx<<<blocks_per_stream, TPB,0,streams[i]>>>(d_values_temp_i,d_csc,d_succ,d_max,node_size,NUMSTRM);
             if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                 std::cout<<"Error synchronizing device for Zero_Rows_Max_Idx at stream "<<i<<endl;
             }

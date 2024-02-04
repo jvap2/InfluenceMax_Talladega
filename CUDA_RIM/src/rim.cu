@@ -12,7 +12,7 @@ __device__ float eval_values(float rand_num, float val,float threshold){
 
 __device__ float eval_values_v2(float rand_num, float val,float threshold){
     if(rand_num > threshold){
-        return rand_num;
+        return val*rand_num;
     }
     else{
         return 0.0f;
@@ -2483,7 +2483,13 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int start = csc[int_idx];
         unsigned int end = (int_idx+1 < node_size) ? csc[int_idx+1] : start;
         for(int i = start; i < end; i++){
-            values[i] *=.5;
+            values[i]*=.25;
+            unsigned int succ_idx = succ[i];
+            unsigned int start_succ = csc[succ_idx];
+            unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
+            for(int j = start_succ; j < end_succ; j++){
+                values[j]*=.5;
+            }
         }
     }
 }
