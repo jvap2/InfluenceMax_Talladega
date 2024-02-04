@@ -2476,6 +2476,17 @@ __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, 
     }
 }
 
+__global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    if(tid<num_cancel && idx[tid]<node_size){
+        unsigned int int_idx =idx[tid];
+        unsigned int start = csc[int_idx];
+        unsigned int end = (int_idx+1 < node_size) ? csc[int_idx+1] : start;
+        for(int i = start; i < end; i++){
+            values[i] *=.5;
+        }
+    }
+}
 __host__ void Verify_Pr(float* sparse_vec, float* full_vec, unsigned int node_size){
     for(int i = 0; i<node_size;i++){
         if(abs(sparse_vec[i]- full_vec[i])>=1e-6){

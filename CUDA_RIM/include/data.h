@@ -36,9 +36,9 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 150
+#define K 200
 
-#define NUMSTRM 6
+#define NUMSTRM 8
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
@@ -270,6 +270,25 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
         }
     }
 }
+
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult_Mart_BFS_v2(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int* visited, float* penalty, float threshold,unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
+        float sum = 0.0f;
+        for(IndexType i = start; i < end; i++){
+            sum += values[i]*vec[succ[i]];
+        }
+        sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
+        if(visited[t]==0 && sum>0){
+            result[t] = sum*penalty[t];
+            visited[t] =1;
+        }
+    }
+}
+
 __device__ float sigmoid(float x);
 
 __device__ float tanh_dev(float x);
@@ -373,6 +392,8 @@ __global__ void Gen_P_Mem_eff(float* weight_P, unsigned int* src, unsigned int* 
 
 __global__ void Init_P(float* P, unsigned int node_size, float* damp);
 
+__global__ void Calc_Penalty(float* d_res, float* d_penality, unsigned int node_size);
+
 __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
 __host__ void  RIM_rand_Ver5_Sig(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
@@ -400,7 +421,11 @@ __global__ void Fill_Diag(float* A, float* diag, unsigned int node_size, unsigne
 __global__ void Prob_BFS_Score_Kernel(unsigned int* d_csc, unsigned int* d_succ, unsigned int node_size, unsigned int edge_size, float* d_score, unsigned int* d_visited,
 unsigned int* frontier, unsigned int* next_frontier, float threshold, int level);
 
+__host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
+
 __host__ void Prob_BFS_Score(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
+
+__global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int* succ, unsigned int* idx, unsigned int node_size, unsigned int num_cancel);
 //Device Functions
 
 __global__ void Transform_Bool(float* d_res, unsigned int* d_vec, unsigned int node_size);

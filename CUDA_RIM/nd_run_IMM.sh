@@ -1,7 +1,7 @@
 #!/bin/sh
 
 vers=8
-seed_size=150
+seed_size=200
 ep=.5
 data_set=7
 walk=0
@@ -48,10 +48,8 @@ conan create conan/nvidia-cub
 conan install . --build missing -o gpu=nvidia
 conan build . -o gpu=nvidia
 cd build/Release/tools
-if [ "$vers" -eq 7 ]; then 
-    ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_IC.json
-    ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_LT.json
-fi
+./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_IC.json
+./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/nd.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_nd_LT.json
 python3 collectdata_ic.py $data_set $vers
 python3 collectdata_lt.py $data_set $vers
 cd ../../../../CUDA_RIM/src

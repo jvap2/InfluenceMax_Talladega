@@ -415,7 +415,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,ND_DATA_MEASURE_RPR,ND_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS(csr,succ,no_nodes,no_edges,seed_set,.5f,ND_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,ND_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
