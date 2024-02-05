@@ -2492,7 +2492,7 @@ __global__ void Zero_Rows(float* values, unsigned int* csc, unsigned int* succ, 
         unsigned int start = csc[int_idx];
         unsigned int end = csc[int_idx+1];
         for(int i = start; i < end; i++){
-            values[i] = 0.0f;
+            values[i] *= .5f;
         }
     }
 }
@@ -2505,12 +2505,12 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int end = (int_idx+1 < node_size) ? csc[int_idx+1] : start;
         for(int i = start; i < end; i++){
             values[i]*=.5;
-            // unsigned int succ_idx = succ[i];
-            // unsigned int start_succ = csc[succ_idx];
-            // unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
-            // for(int j = start_succ; j < end_succ; j++){
-            //     values[j]*=.5;
-            // }
+            unsigned int succ_idx = succ[i];
+            unsigned int start_succ = csc[succ_idx];
+            unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
+            for(int j = start_succ; j < end_succ; j++){
+                values[j]*=.5;
+            }
         }
     }
 }

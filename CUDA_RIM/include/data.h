@@ -265,12 +265,12 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
         IndexType end = csc[t+1];
         float sum = 0.0f;
         for(IndexType i = start; i < end; i++){
-            sum += values[i]*vec[succ[i]];
+            sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
         }
         sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
-        if(visited[t]==0 && sum>0){
-            result[t] = sum;
-            visited[t] =1;
+        if(visited[t]==0){
+            result[t] += sum;
+            atomicExch(&visited[t],1);
         }
     }
 }

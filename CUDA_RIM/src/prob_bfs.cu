@@ -821,7 +821,11 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
     thrust::fill(h_rand_idx, h_rand_idx+node_size, 0);
     // Take the sum of the vectors and then sort them
     for(int i = 1; i<NUMSTRM;i++){
-        thrust::transform(thrust::device, store_stream_res, store_stream_res+node_size, store_stream_res+i*node_size, store_stream_res, thrust::plus<float>());
+        float* store_stream_res_i = store_stream_res + i*node_size;
+        Float_VectAdd<<<blocks_per_stream, TPB>>>(store_stream_res, store_stream_res_i, node_size);
+        if(!HandleCUDAError(cudaDeviceSynchronize())){
+            std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+        }
     }
     //Get the top k indexes
     float* h_store_stream_res_fin = new float[node_size];

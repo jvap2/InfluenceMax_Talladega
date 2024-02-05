@@ -21,10 +21,10 @@ $(BIN)/IMM: $(OBJ)/main.o $(OBJ)/rim.o $(OBJ)/data.o $(OBJ)/err.o $(OBJ)/pr.o $(
 
 
 
-$(OBJ)/data.o: $(SRC)/dataprocessing.cpp
+$(OBJ)/data.o: $(SRC)/dataprocessing.cu
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-$(OBJ)/main.o: $(SRC)/main.cpp
+$(OBJ)/main.o: $(SRC)/main.cu
 	$(NVCC) $(NVCC_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 $(OBJ)/rim.o: $(SRC)/rim.cu 
