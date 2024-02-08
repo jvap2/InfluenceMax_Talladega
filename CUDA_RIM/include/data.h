@@ -404,6 +404,7 @@ __global__ void sparseCSRMat_Vec_Mult_BFS_Tanh(IndexType* csc, IndexType* succ, 
     }
 }
 
+__global__ void Condense_Score(float* fin, float* inter, unsigned int node_size, unsigned int num_strm);
 
 template <typename T>
 __global__ void Copy(T* d_res, T* d_vec, unsigned int node_size);

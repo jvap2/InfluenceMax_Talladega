@@ -1024,8 +1024,9 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     float tol_thresh=1;
     epochs = 500*(K/NUMSTRM+1);
     for(int i = 0; i<NUMSTRM;i++){
+        //Fill the values list prior to the start of the algorithm
         thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+i*edge_size+edge_size, 1.0f);
-        thrust::fill(thrust::device.on(streams[i]), d_values_temp+i*edge_size, d_values_temp+i*edge_size+edge_size, 1.0f);
+        // thrust::fill(thrust::device.on(streams[i]), d_values_temp+i*edge_size, d_values_temp+i*edge_size+edge_size, 1.0f);
     }
     for(int k = 0; k < epochs; k++){
         // std::cout<<"Epoch "<<k<<endl;
@@ -1123,7 +1124,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
             std::cout<<"Error copying max_index to device"<<endl;
         }
         for(int i=0; i<NUMSTRM;i++){
-            float* d_values_temp_i = d_values_temp + i*edge_size;
+            float* d_values_temp_i = d_values + i*edge_size;
             Zero_Rows_Max_Idx<<<blocks_per_stream, TPB,0,streams[i]>>>(d_values_temp_i,d_csc,d_succ,d_max,node_size,NUMSTRM);
             if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
                 std::cout<<"Error synchronizing device for Zero_Rows_Max_Idx at stream "<<i<<endl;
@@ -1160,16 +1161,18 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     unsigned int* h_rand_score_idx = new unsigned int[node_size];
     thrust::fill(h_rand_idx, h_rand_idx+node_size, 0);
     // Take the sum of the vectors and then sort them
-    for(int i = 1; i<NUMSTRM;i++){
-        float* store_stream_res_i = store_stream_res + i*node_size;
-        Float_VectAdd<<<blocks_per_stream, TPB>>>(store_stream_res, store_stream_res_i, node_size);
-        if(!HandleCUDAError(cudaDeviceSynchronize())){
-            std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
-        }
+    float* d_store_res_fin;
+    if(!HandleCUDAError(cudaMalloc((void**)&d_store_res_fin, sizeof(float)*node_size))){
+        std::cout<<"Error allocating memory for d_store_res_fin"<<endl;
+    }
+    thrust::fill(thrust::device, d_store_res_fin, d_store_res_fin+node_size, 0.0f);
+    Condense_Score<<<blocks_per_stream, TPB>>>(d_store_res_fin, store_stream_res, node_size, NUMSTRM);
+    if(!HandleCUDAError(cudaDeviceSynchronize())){
+        std::cout<<"Error synchronizing device for Condense_Score"<<endl;
     }
     //Get the top k indexes
-    float* h_store_stream_res_fin = new float[node_size];
-    if(!HandleCUDAError(cudaMemcpy(h_store_stream_res_fin, store_stream_res, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
+    float* h_store_stream_res_fin = new float[node_size*NUMSTRM];
+    if(!HandleCUDAError(cudaMemcpy(h_store_stream_res_fin, d_store_res_fin, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
         std::cout<<"Error copying store_stream_res to host"<<endl;
     }
     thrust::sequence(h_rand_score_idx, h_rand_score_idx+node_size,0);
@@ -1239,5 +1242,14 @@ __global__ void Calc_Penalty(float* d_res, float* d_penality, unsigned int node_
     unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
     for(int i = idx; i < node_size; i += blockDim.x * gridDim.x){
         d_penality[i] += 1-d_res[i];
+    }
+}
+
+__global__ void Condense_Score(float* fin, float* inter, unsigned int node_size, unsigned int num_strm){
+    unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    for(int i = idx; i < node_size; i += blockDim.x * gridDim.x){
+        for(int j = 0; j < num_strm; j++){
+            fin[i] += inter[i+j*node_size];
+        }
     }
 }

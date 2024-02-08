@@ -2447,7 +2447,7 @@ __host__ void CheckSparseMatVec(unsigned int* csc, unsigned int* succ,edge* edge
 __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < size){
-        vec1[tid] += vec2[tid];
+        vec1[tid] = vec1[tid]+vec2[tid];
     }
 }
 
@@ -2509,7 +2509,7 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
             unsigned int start_succ = csc[succ_idx];
             unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
             for(int j = start_succ; j < end_succ; j++){
-                values[j]*=.5;
+                values[j]=0.0f;
             }
         }
     }
@@ -2522,7 +2522,7 @@ __global__ void Zero_Cols_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int int_idx = succ[i];
         for(int j = 0; j < num_cancel; j++){
             if(idx[j] == int_idx){
-                values[i] *= 0.5f;
+                values[i] = 0.0f;
                 break;
             }
         }
