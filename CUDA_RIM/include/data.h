@@ -38,7 +38,7 @@
 #define TPB 256
 #define K 200
 
-#define NUMSTRM 8
+#define NUMSTRM 12
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
@@ -266,11 +266,17 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
         float sum = 0.0f;
         for(IndexType i = start; i < end; i++){
             sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
+            // if(visited[succ[i]]==1){
+            //     printf("Vec: %f\n",vec[succ[i]]);
+            //     printf("values: %f\n",values[i]);
+            // }
         }
         sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
         if(visited[t]==0){
             result[t] += sum;
-            atomicExch(&visited[t],1);
+            if(sum>0){
+                atomicExch(&visited[t],1);
+            }
         }
     }
 }
@@ -289,6 +295,28 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS_v2(IndexType* csc, IndexType* suc
         if(visited[t]==0 && sum>0){
             result[t] = sum*penalty[t];
             visited[t] =1;
+        }
+    }
+}
+
+template <typename IndexType>
+__global__ void sparseCSRMat_Vec_Mult_Mart_BFS_v3(IndexType* csc, IndexType* succ, float* values, float* vec, float* result, unsigned int* visited, float threshold,unsigned int node_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    for(int t = tid; t < node_size; t+=blockDim.x*gridDim.x){
+        IndexType start = csc[t];
+        IndexType end = csc[t+1];
+        float sum = 0.0f;
+        for(IndexType i = start; i < end; i++){
+            sum += values[i]*vec[succ[i]];
+        }
+        sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
+        if(visited[t]==0){
+            result[t] += sum;
+            atomicExch(&visited[t],1);
+        }
+        if(visited[t]==1){
+            result[t] = 0;
+            atomicExch(&visited[t],0);
         }
     }
 }
@@ -430,6 +458,10 @@ __global__ void Prob_BFS_Score_Kernel(unsigned int* d_csc, unsigned int* d_succ,
 unsigned int* frontier, unsigned int* next_frontier, float threshold, int level);
 
 __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
+
+
+__host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
+
 
 __host__ void Prob_BFS_Score(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, float threshold, string file);
 

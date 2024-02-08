@@ -4,6 +4,7 @@
         "iosfwd": "cpp",
         "ostream": "cpp",
         "new": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "cmath": "cpp"
     }
 }
