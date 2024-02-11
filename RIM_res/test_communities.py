@@ -49,7 +49,7 @@ if vers ==3:
         time_file = "../RIM_data/HepTh/meas_8.csv"
 if vers ==4:
     File = "../Graph_Data_Storage/wiki-Vote.txt"
-    top = pd.read_csv("res_wiki.csv").to_numpy().flatten()
+    top = pd.read_csv("res_wiki_new.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_wiki_LT.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_wiki_IC.csv").to_numpy().flatten()
     if rim_vers==1:

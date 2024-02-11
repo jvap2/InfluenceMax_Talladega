@@ -4,7 +4,7 @@ vers=3
 seed_size=100
 ep=.5
 data_set=10
-walk=1
+walk=0
 
 if [ $vers -eq 1 ]; then
     name=one

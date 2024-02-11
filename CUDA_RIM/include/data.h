@@ -32,11 +32,14 @@
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 #include <thrust/extrema.h>
+#include <thrust/shuffle.h>
+#include <thrust/random.h>
+#include <thrust/execution_policy.h>
 #include <cusolverDn.h>
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 200
+#define K 150
 
 #define NUMSTRM 12
 
@@ -183,6 +186,11 @@ using namespace std;
 struct edge{
     unsigned int src;
     unsigned int dst;
+};
+
+struct ValueTuple {
+    unsigned int idx;
+    unsigned int count;
 };
 
 void readData(string filename, edge* edge_list);
@@ -431,6 +439,8 @@ __global__ void Init_P(float* P, unsigned int node_size, float* damp);
 
 __global__ void Calc_Penalty(float* d_res, float* d_penality, unsigned int node_size);
 
+__global__ void Float_VectAdd_Cap(float* vec1, float* vec2, unsigned int* idx, unsigned int size, unsigned int idx_size);
+
 __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
 
 __host__ void  RIM_rand_Ver5_Sig(unsigned int* csc, unsigned int* succ, unsigned int node_size, unsigned int edge_size, unsigned int* seed_set, string file, string pr_file);
@@ -476,6 +486,11 @@ __global__ void Transform_Bool(float* d_res, unsigned int* d_vec, unsigned int n
 __device__ float eval_values(float rand_num, float val,float threshold);
 
 __device__ float eval_values_v2(float rand_num, float val,float threshold);
+
+
+void Split_Tuple_Count(unsigned int* count, unsigned int* idx, ValueTuple* list, unsigned int node_size);
+
+void Make_Tuple_Count(unsigned int* count, unsigned int* idx, ValueTuple* list, unsigned int node_size);
 
 
 

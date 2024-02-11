@@ -95,6 +95,21 @@ void h_MatVecMult(float* h_A, float* h_x, float* h_y, unsigned int node_size){
     }
 }
 
+void Make_Tuple_Count(unsigned int* count, unsigned int* idx, ValueTuple* list, unsigned int node_size){
+    for(int i = 0; i<node_size;i++){
+        list[i].idx = idx[i];
+        list[i].count = count[i];
+    }
+}
+
+
+void Split_Tuple_Count(unsigned int* count, unsigned int* idx, ValueTuple* list, unsigned int node_size){
+    for(int i = 0; i<node_size;i++){
+        idx[i] = list[i].idx;
+        count[i] = list[i].count;
+    }
+}
+
 void Normalize_L2(float* h_x, unsigned int node_size){
     float norm=0.0f;
     for(int i=0; i<node_size;i++){

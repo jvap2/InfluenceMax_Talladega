@@ -917,6 +917,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     float* d_res_temp;
     unsigned int* max_index = new unsigned int[NUMSTRM]; 
     float* penalty_sum = new float[NUMSTRM];
+    unsigned int* d_idx;
     thrust::fill(count, count+node_size, 0);
     thrust::fill(sum, sum+NUMSTRM, 0.0f);
     thrust::fill(tol,tol+NUMSTRM, 100.0f);
@@ -959,6 +960,9 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     }
     if(!HandleCUDAError(cudaMalloc((void**)&d_res_temp, sizeof(float)*NUMSTRM*node_size))){
         std::cout<<"Error allocating memory for d_res_temp"<<endl;
+    }
+    if(!HandleCUDAError(cudaMalloc((void**)&d_idx, sizeof(unsigned int)*NUMSTRM*node_size))){
+        std::cout<<"Error allocating memory for d_idx"<<endl;
     }
     if(!HandleCUDAError(cudaMemcpy(d_csc, csc, sizeof(unsigned int)*(node_size+1), cudaMemcpyHostToDevice))){
         std::cout<<"Error copying csc to device"<<endl;
@@ -1022,7 +1026,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     cudaEventCreate(&stop);
     cudaEventRecord(start);
     float tol_thresh=1;
-    epochs = 500*(K/NUMSTRM+1);
+    epochs = .5*(K*K)*(node_size/(num_walker*NUMSTRM)+1);
     for(int i = 0; i<NUMSTRM;i++){
         //Fill the values list prior to the start of the algorithm
         thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+i*edge_size+edge_size, 1.0f);
@@ -1101,21 +1105,28 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
             float* store_stream_res_i = store_stream_res + i*node_size;
             float* d_penality_i = d_penality + i*node_size;
             float* d_res_temp_i = d_res_temp + i*node_size;
+            unsigned int* d_idx_i = d_idx + i*node_size;
             //Take the softmax of rand_vec_init_i
             thrust::copy(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, d_res_temp_i);
             sum[i] = thrust::reduce(thrust::device.on(streams[i]), d_res_temp_i, d_res_temp_i+node_size);
             float temp = sum[i];
             // cout<<"Sum: "<<sum[i]<<endl;
             if(sum[i]>0){
+                thrust::sequence(thrust::device.on(streams[i]), d_idx_i, d_idx_i+node_size,0);
                 thrust::transform(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, rand_vec_init_i, [=] __device__ (float x) { return x/temp; });
-                Float_VectAdd<<<blocks_per_stream, TPB,0,streams[i]>>>(store_stream_res_i,rand_vec_init_i, node_size);
-                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
-                    std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
-                }
                 //Find the index of the maximum element in the vector
                 float* iter = thrust::max_element(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size);
                 max_index[i] = iter - rand_vec_init_i;
                 count[max_index[i]]++;
+                thrust::copy(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, d_penality_i);
+                thrust::sort_by_key(thrust::device.on(streams[i]), d_penality_i, d_penality_i+node_size, d_idx_i, thrust::greater<float>());
+                //Changes here
+                Float_VectAdd_Cap<<<blocks_per_stream, TPB,0,streams[i]>>>(store_stream_res_i,rand_vec_init_i,d_idx_i, node_size, K);
+                if(!HandleCUDAError(cudaStreamSynchronize(streams[i]))){
+                    std::cout<<"Error synchronizing device for Float_VectAdd at stream "<<i<<endl;
+                }
+                thrust::fill(thrust::device.on(streams[i]), rand_vec_init_i, rand_vec_init_i+node_size, 0);
+
             }
             unsigned int nmstrm = NUMSTRM;
             // thrust::transform(thrust::device.on(streams[i]), d_penality, d_penality+node_size, d_penality, [=] __device__ (float x) { return (x/nmstrm); });
@@ -1175,16 +1186,24 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     if(!HandleCUDAError(cudaMemcpy(h_store_stream_res_fin, d_store_res_fin, sizeof(float)*node_size, cudaMemcpyDeviceToHost))){
         std::cout<<"Error copying store_stream_res to host"<<endl;
     }
-    thrust::sequence(h_rand_score_idx, h_rand_score_idx+node_size,0);
-    thrust::sort_by_key(h_store_stream_res_fin, h_store_stream_res_fin+node_size, h_rand_score_idx, thrust::greater<float>());
+    // thrust::sequence(h_rand_score_idx, h_rand_score_idx+node_size,0);
+    // thrust::sort_by_key(h_store_stream_res_fin, h_store_stream_res_fin+node_size, h_rand_score_idx, thrust::greater<float>());
     thrust::sequence(h_rand_idx, h_rand_idx+node_size,0);
+    ValueTuple* count_tuple = new ValueTuple[node_size];
+    Make_Tuple_Count(count,h_rand_idx,count_tuple, node_size);
+    thrust::sort_by_key(h_store_stream_res_fin,h_store_stream_res_fin+node_size,count_tuple, thrust::greater<float>());
+    // thrust::default_random_engine g;
+    // thrust::shuffle(thrust::host, count, count + node_size, g);
+    //Need to find a way to shuffle the indexes that have the same values, shuffle based on score first, then by count
+    Split_Tuple_Count(count, h_rand_idx, count_tuple, node_size);
+    Export_Scores(SCORE_PATH, h_store_stream_res_fin, h_rand_idx, node_size);
     thrust::sort_by_key(count, count+node_size, h_rand_idx, thrust::greater<unsigned int>());
+
     for(int i = 0; i < K; i++){
-        seed_set[i] = h_rand_score_idx[i];
+        seed_set[i] = h_rand_idx[i];
         cout<<count[i]<<endl;
     }
     Export_Counts(COUNT_PATH, count,h_rand_idx, node_size);
-    Export_Scores(SCORE_PATH, h_store_stream_res_fin, h_rand_score_idx, node_size);
     // delete[] h_rand_idx;
 
     for(int i = 0; i<NUMSTRM;i++){

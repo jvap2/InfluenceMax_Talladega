@@ -1,10 +1,10 @@
 #!/bin/sh
 
-vers=3
+vers=8
 seed_size=100
 ep=.5
 data_set=4
-walk=1
+walk=0
 
 if [ $vers -eq 1 ]; then
     name=one

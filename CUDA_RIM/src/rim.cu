@@ -2451,6 +2451,17 @@ __global__ void Float_VectAdd(float* vec1, float* vec2, unsigned int size){
     }
 }
 
+
+__global__ void Float_VectAdd_Cap(float* vec1, float* vec2, unsigned int* idx, unsigned int size, unsigned int idx_size){
+    unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
+    if(tid < idx_size){
+        unsigned int index = idx[tid];
+        if(index < size){
+            vec1[index] = vec1[index]+vec2[index];
+        }
+    }
+}
+
 __global__ void Int_PointAdd(int* vec1, int* vec2, unsigned int size){
     unsigned int tid = threadIdx.x + blockIdx.x*blockDim.x;
     if(tid < size){
@@ -2504,12 +2515,12 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int start = csc[int_idx];
         unsigned int end = (int_idx+1 < node_size) ? csc[int_idx+1] : start;
         for(int i = start; i < end; i++){
-            values[i]*=.5;
+            values[i]/=(1.0f*K);
             unsigned int succ_idx = succ[i];
             unsigned int start_succ = csc[succ_idx];
             unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
             for(int j = start_succ; j < end_succ; j++){
-                values[j]=0.0f;
+                values[j]*=0.5f;
             }
         }
     }
@@ -2522,7 +2533,7 @@ __global__ void Zero_Cols_Max_Idx(float* values, unsigned int* csc, unsigned int
         unsigned int int_idx = succ[i];
         for(int j = 0; j < num_cancel; j++){
             if(idx[j] == int_idx){
-                values[i] = 0.0f;
+                values[i] /=(1.0f*K);
                 break;
             }
         }

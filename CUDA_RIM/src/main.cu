@@ -60,7 +60,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,HEPTH_DATA_MEASURE_RPR,HEPTH_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,HEPTH_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,HEPTH_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,WIKI_VOTE_DATA_MEASURE_RPR,WIKI_VOTE_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,WIKI_VOTE_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,WIKI_VOTE_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,ARVIX_DATA_MEASURE_RPR,ARVIX_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,ARVIX_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,ARVIX_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -238,7 +238,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,HOMO_DATA_MEASURE_RPR,HOMO_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,HOMO_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,HOMO_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -297,7 +297,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,EP_DATA_MEASURE_RPR,EP_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,EP_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,EP_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -356,7 +356,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,AM_DATA_MEASURE_RPR,AM_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,AM_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,AM_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -474,7 +474,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,GGL_DATA_MEASURE_RPR,GGL_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,GGL_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,GGL_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -533,7 +533,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,BRK_DATA_MEASURE_RPR,BRK_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,BRK_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,BRK_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
@@ -592,7 +592,7 @@ int main(int argc, char** argv)
                 RIM_rand_Ver9_BFS(csr,succ,no_nodes,no_edges,seed_set,WKT_DATA_MEASURE_RPR,WKT_PR);
             else if(strcmp(argv[2],"bfs")==0){
                 if(strcmp(argv[3],"csr")==0){
-                    RIM_rand_Mart_BFS_v2(csr,succ,no_nodes,no_edges,seed_set,.5f,WKT_DATA_MEASURE_BFS);
+                    RIM_rand_Mart_BFS_v3(csr,succ,no_nodes,no_edges,seed_set,.5f,WKT_DATA_MEASURE_BFS);
                 }
                 else{
                     cout << "You will get incorrect results" << endl;
