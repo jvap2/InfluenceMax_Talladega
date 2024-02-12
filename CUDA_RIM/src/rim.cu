@@ -2520,7 +2520,7 @@ __global__ void Zero_Rows_Max_Idx(float* values, unsigned int* csc, unsigned int
             unsigned int start_succ = csc[succ_idx];
             unsigned int end_succ = (succ_idx+1 < node_size) ? csc[succ_idx+1] : start_succ;
             for(int j = start_succ; j < end_succ; j++){
-                values[j]*=0.5f;
+                values[j]*=0.25f;
             }
         }
     }

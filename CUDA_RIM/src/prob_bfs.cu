@@ -895,7 +895,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
             std::cout<<"Error creating stream number "<<i<<endl;
         }
     }
-    unsigned int num_walker = node_size/NUMSTRM;
+    unsigned int num_walker = node_size/K;
     unsigned int epochs;
     unsigned int* d_csc;
     unsigned int* d_succ;
@@ -1026,7 +1026,10 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     cudaEventCreate(&stop);
     cudaEventRecord(start);
     float tol_thresh=1;
-    epochs = .5*(K*K)*(node_size/(num_walker*NUMSTRM)+1);
+    // epochs = (K)*(node_size/(NUMSTRM)+1);
+    // epochs = 500*(K/NUMSTRM+1);
+    epochs = (node_size/(600*NUMSTRM)+1)*(K/2);
+    cout<<"Epochs: "<<epochs<<endl;
     for(int i = 0; i<NUMSTRM;i++){
         //Fill the values list prior to the start of the algorithm
         thrust::fill(thrust::device.on(streams[i]), d_values+i*edge_size, d_values+i*edge_size+edge_size, 1.0f);
@@ -1093,12 +1096,20 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
                     thrust::fill(thrust::device.on(streams[i]), d_res_temp_i, d_res_temp_i+node_size, 0.0f);
                 }
             }
+            //In circumstance where we want all the be less than
             check = false;
             for(int i=0;i<NUMSTRM;i++){
                 if(tol[i] > 1e-5){
                     check = true;
                 }
             }
+            //In circumstance we want one to be less than
+            // check = true;
+            // for(int i=0;i<NUMSTRM;i++){
+            //     if(tol[i] <= 1e-5){
+            //         check = false;
+            //     }
+            // }
         }
         for(int i = 0; i<NUMSTRM;i++){
             float* rand_vec_init_i = rand_vec_init + i*node_size;

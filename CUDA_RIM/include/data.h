@@ -39,9 +39,9 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 150
+#define K 250
 
-#define NUMSTRM 12
+#define NUMSTRM 10
 
 #define HOMO_PATH "../Graph_Data_Storage/homo.csv"
 #define HOMO_CSC_PATH "../Graph_Data_Storage/homo_csc.csv"
@@ -179,7 +179,7 @@
 #define SCORE_PATH "../RIM_res/score.csv"
 
 
-#define MAX_WHILE 100
+#define MAX_WHILE 200
 
 using namespace std;
 

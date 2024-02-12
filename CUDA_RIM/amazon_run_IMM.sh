@@ -2,7 +2,7 @@
 
 walk=0
 vers=8
-seed_size=150
+seed_size=250
 ep=.5
 data_set=6
 
