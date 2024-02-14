@@ -895,7 +895,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
             std::cout<<"Error creating stream number "<<i<<endl;
         }
     }
-    unsigned int num_walker = node_size/K;
+    unsigned int num_walker = node_size/(NUMSTRM)+1;
     unsigned int epochs;
     unsigned int* d_csc;
     unsigned int* d_succ;

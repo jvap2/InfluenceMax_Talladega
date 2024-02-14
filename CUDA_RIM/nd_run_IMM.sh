@@ -1,7 +1,7 @@
 #!/bin/sh
 
 vers=8
-seed_size=250
+seed_size=50
 ep=.5
 data_set=7
 walk=0

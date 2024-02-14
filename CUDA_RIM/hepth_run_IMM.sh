@@ -1,8 +1,8 @@
 #!/bin/sh
 
 data_set=3
-vers=3
-seed_size=100
+vers=8
+seed_size=350
 ep=.5
 walk=0
 
@@ -43,8 +43,8 @@ conan create conan/nvidia-cub
 conan install . --build missing -o gpu=nvidia
 conan build . -o gpu=nvidia
 cd build/Release/tools
-./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/ca-HepTh_ripples.csv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_hepth_IC.json
-./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/ca-HepTh_ripples.csv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_hepth_LT.json
+./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/ca-HepTh.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_hepth_IC.json
+./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/ca-HepTh.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_hepth_LT.json
 python3 collectdata_ic.py $data_set $vers
 python3 collectdata_lt.py $data_set $vers
 cd ../../../../CUDA_RIM/src

@@ -28,7 +28,7 @@ if vers ==2:
         time_file = "../RIM_data/arvix/meas_8.csv"
 if vers ==3:
     File = "../Graph_Data_Storage/ca-HepTh.txt"
-    top = pd.read_csv("res_hepth.csv").to_numpy().flatten()
+    top = pd.read_csv("res_HepTh_new.csv").to_numpy().flatten()
     lt_set = pd.read_csv("curip_hepth_LT_new.csv").to_numpy().flatten()
     ic_set = pd.read_csv("curip_hepth_IC_new.csv").to_numpy().flatten()
     if rim_vers==1:
