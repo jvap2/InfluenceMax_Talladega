@@ -303,7 +303,7 @@ fig.savefig("lt_spread_vs_K.png")
 fig = plt.figure()
 fig.set_figheight(15)
 fig.set_figwidth(20)
-fig.suptitle("SpeedUp, RIMR and curipples")
+fig.suptitle("SpeedUp, RIMR and curipples, Streams = 10")
 
 
 ax1 = plt.subplot2grid((3, 13), (0, 0), colspan=3)
