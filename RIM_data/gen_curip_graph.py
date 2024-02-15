@@ -161,6 +161,7 @@ wiki_talk_ic_dist = wiki_talk_df.loc[:,"ic_dist"].to_numpy()
 fig = plt.figure()
 fig.set_figheight(10)
 fig.set_figwidth(25)
+fig.suptitle("IC Spread, RIMR and curipples")
 
 ax1 = plt.subplot2grid((2, 18), (0, 0), colspan=3)
 ax2 = plt.subplot2grid((2, 18), (0, 5), colspan=3)
@@ -227,6 +228,8 @@ fig.savefig("ic_spread_vs_K.png")
 fig = plt.figure()
 fig.set_figheight(10)
 fig.set_figwidth(25)
+fig.suptitle("LT Spread, RIMR and curipples")
+
 
 ax1 = plt.subplot2grid((2, 18), (0, 0), colspan=3)
 ax2 = plt.subplot2grid((2, 18), (0, 5), colspan=3)
@@ -300,6 +303,8 @@ fig.savefig("lt_spread_vs_K.png")
 fig = plt.figure()
 fig.set_figheight(10)
 fig.set_figwidth(25)
+fig.suptitle("SpeedUp, RIMR and curipples")
+
 
 ax1 = plt.subplot2grid((2, 18), (0, 0), colspan=3)
 ax2 = plt.subplot2grid((2, 18), (0, 5), colspan=3)
