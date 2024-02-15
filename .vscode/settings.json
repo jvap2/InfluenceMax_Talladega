@@ -6,5 +6,6 @@
         "new": "cpp",
         "__config": "cpp",
         "cmath": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc-12"
 }

@@ -5,22 +5,33 @@ import networkx as nx
 import sys
 
 
-version = int(sys.argv[1]) 
+# version = int(sys.argv[1]) 
 
-if version == 1:
-    file_name = "/meas.csv"
-elif version == 2:
-    file_name = "/meas_2.csv"
-elif version == 3:
-    file_name = "/meas_3.csv"
+# if version == 1:
+#     file_name = "/meas.csv"
+# elif version == 2:
+#     file_name = "/meas_2.csv"
+# elif version == 3:
+#     file_name = "/meas_3.csv"
+
+file_name = "/meas_8.csv"
 
 arxiv = "arvix"+file_name
-syn = "syn"+file_name
+nd = "nd"+file_name
+berk = "berk"+file_name
+epinions = "epinions"+file_name
+wiki_talk = "wiki_talk"+file_name
+amazon = "amazon"+file_name
 HepTh = "HepTh"+file_name
 
 hep_df = pd.read_csv(HepTh)
 arxiv_df = pd.read_csv(arxiv)
-syn_df = pd.read_csv(syn)
+amazon_df = pd.read_csv(amazon)
+nd_df = pd.read_csv(nd)
+berk_df = pd.read_csv(berk)
+epinions_df = pd.read_csv(epinions)
+wiki_talk_df = pd.read_csv(wiki_talk)
+
 
 hep_df_ic_cu = hep_df.loc[:,"percent_IC_CU"].to_numpy()
 hep_df_lt_cu = hep_df.loc[:,"percent_LT_CU"].to_numpy()
@@ -44,16 +55,64 @@ arxiv_df_time_lt = arxiv_df.loc[:,"time(ms)"].to_numpy()
 arxiv_df_rimr_epochs = np.unique(arxiv_df.loc[:,"epochs"].to_numpy())
 arxiv_df_rimr_streams = np.unique(arxiv_df.loc[:,"streams"].to_numpy())
 
-syn_df_ic_cu = syn_df.loc[:,"percent_IC_CU"].to_numpy()
-syn_df_lt_cu = syn_df.loc[:,"percent_LT_CU"].to_numpy()
-syn_df_ic = syn_df.loc[:,"percent_IC_RIMR"].to_numpy()
-syn_df_lt = syn_df.loc[:,"percent_LT_RIMR"].to_numpy()
-syn_df_ep = syn_df.loc[:,"eps"].to_numpy()
-syn_df_time_lt_cu = syn_df.loc[:,"time_cu_lt"].to_numpy()
-syn_df_time_ic_cu = syn_df.loc[:,"time_cu_ic"].to_numpy()
-syn_df_time_lt = syn_df.loc[:,"time(ms)"].to_numpy()
-syn_df_rimr_epochs = np.unique(syn_df.loc[:,"epochs"].to_numpy())
-syn_df_rimr_streams = np.unique(syn_df.loc[:,"streams"].to_numpy())
+syn_df_ic_cu = nd_df.loc[:,"percent_IC_CU"].to_numpy()  
+syn_df_lt_cu = nd_df.loc[:,"percent_LT_CU"].to_numpy()
+syn_df_ic = nd_df.loc[:,"percent_IC_RIMR"].to_numpy()
+syn_df_lt = nd_df.loc[:,"percent_LT_RIMR"].to_numpy()
+syn_df_ep = nd_df.loc[:,"eps"].to_numpy()
+syn_df_time_lt_cu = nd_df.loc[:,"time_cu_lt"].to_numpy()
+syn_df_time_ic_cu = nd_df.loc[:,"time_cu_ic"].to_numpy()
+syn_df_time_lt = nd_df.loc[:,"time(ms)"].to_numpy()
+syn_df_rimr_epochs = np.unique(nd_df.loc[:,"epochs"].to_numpy())
+syn_df_rimr_streams = np.unique(nd_df.loc[:,"streams"].to_numpy())  
+
+
+amazon_df_ic_cu = amazon_df.loc[:,"percent_IC_CU"].to_numpy()
+amazon_df_lt_cu = amazon_df.loc[:,"percent_LT_CU"].to_numpy()
+amazon_df_ic = amazon_df.loc[:,"percent_IC_RIMR"].to_numpy()
+amazon_df_lt = amazon_df.loc[:,"percent_LT_RIMR"].to_numpy()
+amazon_df_ep = amazon_df.loc[:,"eps"].to_numpy()
+amazon_df_time_lt_cu = amazon_df.loc[:,"time_cu_lt"].to_numpy()
+amazon_df_time_ic_cu = amazon_df.loc[:,"time_cu_ic"].to_numpy()
+amazon_df_time_lt = amazon_df.loc[:,"time(ms)"].to_numpy()
+amazon_df_rimr_epochs = np.unique(amazon_df.loc[:,"epochs"].to_numpy())
+amazon_df_rimr_streams = np.unique(amazon_df.loc[:,"streams"].to_numpy())
+
+berk_df_ic_cu = berk_df.loc[:,"percent_IC_CU"].to_numpy()
+berk_df_lt_cu = berk_df.loc[:,"percent_LT_CU"].to_numpy()
+berk_df_ic = berk_df.loc[:,"percent_IC_RIMR"].to_numpy()
+berk_df_lt = berk_df.loc[:,"percent_LT_RIMR"].to_numpy()
+berk_df_ep = berk_df.loc[:,"eps"].to_numpy()
+berk_df_time_lt_cu = berk_df.loc[:,"time_cu_lt"].to_numpy()
+berk_df_time_ic_cu = berk_df.loc[:,"time_cu_ic"].to_numpy()
+berk_df_time_lt = berk_df.loc[:,"time(ms)"].to_numpy()
+berk_df_rimr_epochs = np.unique(berk_df.loc[:,"epochs"].to_numpy())
+berk_df_rimr_streams = np.unique(berk_df.loc[:,"streams"].to_numpy())
+
+epinions_df_ic_cu = epinions_df.loc[:,"percent_IC_CU"].to_numpy()
+epinions_df_lt_cu = epinions_df.loc[:,"percent_LT_CU"].to_numpy()
+epinions_df_ic = epinions_df.loc[:,"percent_IC_RIMR"].to_numpy()
+epinions_df_lt = epinions_df.loc[:,"percent_LT_RIMR"].to_numpy()
+epinions_df_ep = epinions_df.loc[:,"eps"].to_numpy()
+epinions_df_time_lt_cu = epinions_df.loc[:,"time_cu_lt"].to_numpy()
+epinions_df_time_ic_cu = epinions_df.loc[:,"time_cu_ic"].to_numpy()
+epinions_df_time_lt = epinions_df.loc[:,"time(ms)"].to_numpy()
+epinions_df_rimr_epochs = np.unique(epinions_df.loc[:,"epochs"].to_numpy())
+epinions_df_rimr_streams = np.unique(epinions_df.loc[:,"streams"].to_numpy())
+
+
+wiki_talk_df_ic_cu = wiki_talk_df.loc[:,"percent_IC_CU"].to_numpy()
+wiki_talk_df_lt_cu = wiki_talk_df.loc[:,"percent_LT_CU"].to_numpy()
+wiki_talk_df_ic = wiki_talk_df.loc[:,"percent_IC_RIMR"].to_numpy()
+wiki_talk_df_lt = wiki_talk_df.loc[:,"percent_LT_RIMR"].to_numpy()
+wiki_talk_df_ep = wiki_talk_df.loc[:,"eps"].to_numpy()
+wiki_talk_df_time_lt_cu = wiki_talk_df.loc[:,"time_cu_lt"].to_numpy()
+wiki_talk_df_time_ic_cu = wiki_talk_df.loc[:,"time_cu_ic"].to_numpy()
+wiki_talk_df_time_lt = wiki_talk_df.loc[:,"time(ms)"].to_numpy()
+wiki_talk_df_rimr_epochs = np.unique(wiki_talk_df.loc[:,"epochs"].to_numpy())
+wiki_talk_df_rimr_streams = np.unique(wiki_talk_df.loc[:,"streams"].to_numpy())
+
+
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
