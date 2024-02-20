@@ -163,13 +163,13 @@ fig.set_figheight(15)
 fig.set_figwidth(20)
 fig.suptitle("IC Spread, RIMR and curipples")
 
-ax1 = plt.subplot2grid((3, 13), (0, 0), colspan=3)
-ax2 = plt.subplot2grid((3, 13), (0, 5), colspan=3)
-ax3 = plt.subplot2grid((3, 13), (0,10), colspan=3)
-ax4 = plt.subplot2grid((3, 13), (1,0), colspan=3)
-ax5 = plt.subplot2grid((3, 13), (1,5), colspan=3)
-ax6 = plt.subplot2grid((3, 13), (1,10), colspan=3)
-ax7 = plt.subplot2grid((3, 13), (2,5), colspan=3)
+ax1 = plt.subplot2grid((4, 14), (0, 0), colspan=6)
+ax2 = plt.subplot2grid((4, 14), (0, 7), colspan=6)
+ax3 = plt.subplot2grid((4, 13), (1,0), colspan=6)
+ax4 = plt.subplot2grid((4, 13), (1,7), colspan=6)
+ax5 = plt.subplot2grid((4, 13), (2,0), colspan=6)
+ax6 = plt.subplot2grid((4, 13), (2,7), colspan=6)
+ax7 = plt.subplot2grid((4, 13), (3,4), colspan=6)
 
 
 

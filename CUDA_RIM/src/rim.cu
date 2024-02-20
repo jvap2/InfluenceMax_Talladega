@@ -21,10 +21,10 @@ __device__ float eval_values_v2(float rand_num, float val,float threshold){
 
 
 
-__host__ void Save_Data(string file, float time, float damping_factor, float threshold,unsigned int epoch){
+__host__ void Save_Data(string file, unsigned int blocks, float time, float damping_factor, float threshold,unsigned int epoch){
     ofstream myfile;
     myfile.open(file, std::ios_base::app);
-    myfile<<NUMSTRM<<","<<time<<","<<damping_factor<<","<<threshold<<","<<epoch<<","<<K<<","<<MAX_WHILE;
+    myfile<<NUMSTRM<<","<<blocks<<","<<time<<","<<damping_factor<<","<<threshold<<","<<epoch<<","<<K<<","<<MAX_WHILE;
     myfile.close();
 }
 
@@ -238,7 +238,7 @@ __host__ void  RIM_rand_Ver1(unsigned int* csc, unsigned int* succ, unsigned int
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -496,7 +496,7 @@ __host__ void  RIM_rand_Ver2(unsigned int* csc, unsigned int* succ, unsigned int
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -774,7 +774,7 @@ __host__ void  RIM_rand_Ver3_PR(unsigned int* csc, unsigned int* succ, unsigned 
     cudaEventElapsedTime(&milliseconds, start, stop);
     milliseconds += *pr_time;
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file, blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -1081,7 +1081,7 @@ __host__ void  RIM_rand_Ver4_Greedy(unsigned int* csc, unsigned int* succ, unsig
     cudaEventElapsedTime(&milliseconds, start, stop);
     milliseconds += *pr_time;
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -1350,7 +1350,7 @@ __host__ void  RIM_rand_Ver5_Sig(unsigned int* csc, unsigned int* succ, unsigned
     cudaEventElapsedTime(&milliseconds, start, stop);
     milliseconds += *pr_time;
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -1642,7 +1642,7 @@ __host__ void  RIM_rand_Ver6_Tanh(unsigned int* csc, unsigned int* succ, unsigne
     cudaEventElapsedTime(&milliseconds, start, stop);
     milliseconds += *pr_time;
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -1917,7 +1917,7 @@ __host__ void  RIM_rand_Ver7_PR_Rand(unsigned int* csc, unsigned int* succ, unsi
     cudaEventElapsedTime(&milliseconds, start, stop);
     milliseconds += *pr_time;
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -2193,7 +2193,7 @@ __host__ void  RIM_rand_Ver8_Rand(unsigned int* csc, unsigned int* succ, unsigne
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }

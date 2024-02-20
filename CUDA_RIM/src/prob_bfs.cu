@@ -460,7 +460,7 @@ __host__ void  RIM_rand_Mart_BFS(unsigned int* csc, unsigned int* succ, unsigned
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -804,7 +804,7 @@ __host__ void  RIM_rand_Mart_BFS_v2(unsigned int* csc, unsigned int* succ, unsig
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }
@@ -887,6 +887,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     int maxActiveBlocksPerMultiprocessor = prop.maxThreadsPerMultiProcessor / TPB;
     int maxActiveBlocks = prop.multiProcessorCount * maxActiveBlocksPerMultiprocessor;
     int blocks_per_stream = maxActiveBlocks/NUMSTRM;
+    blocks_per_stream = 40;
 
     printf("Max active blocks: %d\n", maxActiveBlocks);
     cudaStream_t* streams = (cudaStream_t*)malloc(sizeof(cudaStream_t)*NUMSTRM);
@@ -1163,7 +1164,7 @@ __host__ void  RIM_rand_Mart_BFS_v3(unsigned int* csc, unsigned int* succ, unsig
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, start, stop);
     std::cout<<"Time taken: "<<milliseconds<<endl;
-    Save_Data(file, milliseconds, damping_factor, threshold, epochs);
+    Save_Data(file,blocks_per_stream, milliseconds, damping_factor, threshold, epochs);
     if(!HandleCUDAError(cudaFree(d_csc))){
         std::cout<<"Error freeing d_csc"<<endl;
     }

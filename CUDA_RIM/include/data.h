@@ -39,7 +39,7 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 100
+#define K 50
 
 #define NUMSTRM 10
 
@@ -238,7 +238,7 @@ void Normalize_L2(float* h_x, unsigned int node_size);
 void Export_Seed_Set_to_CSV(unsigned int* seed_set, unsigned int seed_size, string path);
 
 
-__host__ void Save_Data(string file, float time, float damping_factor, float threshold,unsigned int epoch);
+__host__ void Save_Data(string file, unsigned int blocks, float time, float damping_factor, float threshold,unsigned int epoch);
 
 
 //CUDA
@@ -274,10 +274,6 @@ __global__ void sparseCSRMat_Vec_Mult_Mart_BFS(IndexType* csc, IndexType* succ, 
         float sum = 0.0f;
         for(IndexType i = start; i < end; i++){
             sum += values[i]*vec[succ[i]]*(visited[succ[i]]);
-            // if(visited[succ[i]]==1){
-            //     printf("Vec: %f\n",vec[succ[i]]);
-            //     printf("values: %f\n",values[i]);
-            // }
         }
         sum*= exp(-(powf(log(1-threshold),2.0f))/((2/3)*powf(log(1-threshold),2.0f)+(2/3)*log(1-threshold)+1));
         if(visited[t]==0){
