@@ -155,6 +155,7 @@ wiki_talk_lt_speedup = wiki_talk_df.loc[:,"speedup_LT"].to_numpy()
 wiki_talk_ic_speedup = wiki_talk_df.loc[:,"speedup_IC"].to_numpy()
 wiki_talk_rimr_dist = wiki_talk_df.loc[:,"rimr_dist"].to_numpy()
 wiki_talk_ic_dist = wiki_talk_df.loc[:,"ic_dist"].to_numpy()
+wiki_talk_lt_dist = wiki_talk_df.loc[:,"lt_dist"].to_numpy()
 
 
 
@@ -377,6 +378,78 @@ plt.show()
 
 fig.savefig("speedup_vs_K.png")
 
+
+fig = plt.figure()
+fig.set_figheight(16)
+fig.set_figwidth(16)
+fig.suptitle("IC Spread, RIMR and curipples")
+
+ax1 = plt.subplot2grid((4, 15), (0, 1), colspan=6)
+ax2 = plt.subplot2grid((4, 15), (0, 8), colspan=6)
+ax3 = plt.subplot2grid((4, 15), (1,1), colspan=6)
+ax4 = plt.subplot2grid((4, 15), (1,8), colspan=6)
+ax5 = plt.subplot2grid((4, 15), (2,1), colspan=6)
+ax6 = plt.subplot2grid((4, 15), (2,8), colspan=6)
+ax7 = plt.subplot2grid((4, 15), (3,4), colspan=7)
+
+# Add vertical space between the figures
+plt.subplots_adjust(hspace=0.5)
+
+## Plot the RIMR distance vs LT distance
+ax1.set_xlabel("K")
+ax1.set_ylabel("Distance")
+ax1.set_title("RIMR distance vs LT distance, HepTh")
+ax1.plot(hep_K, hep_rimr_dist, label="RIMR")
+ax1.plot(hep_K, hep_lt_dist, label="LT")
+ax1.legend()
+
+ax2.set_xlabel("K")
+ax2.set_ylabel("Distance")
+ax2.set_title("RIMR distance vs LT distance, ca-GrQc")
+ax2.plot(arxiv_K, arxiv_rimr_dist, label="RIMR")
+ax2.plot(arxiv_K, arxiv_lt_dist, label="LT")
+ax2.legend()
+
+ax3.set_xlabel("K")
+ax3.set_ylabel("Distance")
+ax3.set_title("RIMR distance vs LT distance, ND")
+ax3.plot(syn_K, syn_rimr_dist, label="RIMR")
+ax3.plot(syn_K, syn_lt_dist, label="LT")
+ax3.legend()
+
+ax4.set_xlabel("K")
+ax4.set_ylabel("Distance")
+ax4.set_title("RIMR distance vs LT distance, Amazon")
+ax4.plot(amazon_K, amazon_rimr_dist, label="RIMR")
+ax4.plot(amazon_K, amazon_lt_dist, label="LT")
+ax4.legend()
+
+ax5.set_xlabel("K")
+ax5.set_ylabel("Distance")
+ax5.set_title("RIMR distance vs LT distance, Berkeley")
+ax5.plot(berk_K, berk_rimr_dist, label="RIMR")
+ax5.plot(berk_K, berk_lt_dist, label="LT")
+ax5.legend()
+
+ax6.set_xlabel("K")
+ax6.set_ylabel("Distance")
+ax6.set_title("RIMR distance vs LT distance, Epinions")
+ax6.plot(epinions_K, epinions_rimr_dist, label="RIMR")
+ax6.plot(epinions_K, epinions_lt_dist, label="LT")
+ax6.legend()
+
+ax7.set_xlabel("K")
+ax7.set_ylabel("Distance")
+ax7.set_title("RIMR distance vs LT distance, WikiTalk")
+ax7.plot(wiki_talk_K, wiki_talk_rimr_dist, label="RIMR")
+ax7.plot(wiki_talk_K, wiki_talk_lt_dist, label="LT")
+ax7.legend()
+
+plt.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=0.25, hspace=0.2)
+plt.show()
+
+
+fig.savefig("distance_LT.png")
 
 
 
