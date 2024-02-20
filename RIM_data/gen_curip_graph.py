@@ -159,17 +159,21 @@ wiki_talk_ic_dist = wiki_talk_df.loc[:,"ic_dist"].to_numpy()
 
 
 fig = plt.figure()
-fig.set_figheight(15)
-fig.set_figwidth(20)
+fig.set_figheight(16)
+fig.set_figwidth(16)
 fig.suptitle("IC Spread, RIMR and curipples")
 
-ax1 = plt.subplot2grid((4, 14), (0, 0), colspan=6)
-ax2 = plt.subplot2grid((4, 14), (0, 7), colspan=6)
-ax3 = plt.subplot2grid((4, 13), (1,0), colspan=6)
-ax4 = plt.subplot2grid((4, 13), (1,7), colspan=6)
-ax5 = plt.subplot2grid((4, 13), (2,0), colspan=6)
-ax6 = plt.subplot2grid((4, 13), (2,7), colspan=6)
-ax7 = plt.subplot2grid((4, 13), (3,4), colspan=6)
+ax1 = plt.subplot2grid((4, 15), (0, 1), colspan=6)
+ax2 = plt.subplot2grid((4, 15), (0, 8), colspan=6)
+ax3 = plt.subplot2grid((4, 15), (1,1), colspan=6)
+ax4 = plt.subplot2grid((4, 15), (1,8), colspan=6)
+ax5 = plt.subplot2grid((4, 15), (2,1), colspan=6)
+ax6 = plt.subplot2grid((4, 15), (2,8), colspan=6)
+ax7 = plt.subplot2grid((4, 15), (3,4), colspan=7)
+
+# Add vertical space between the figures
+plt.subplots_adjust(hspace=0.5)
+
 
 
 
@@ -226,18 +230,21 @@ ax7.legend()
 fig.savefig("ic_spread_vs_K.png")
 
 fig = plt.figure()
-fig.set_figheight(15)
-fig.set_figwidth(20)
+fig.set_figheight(16)
+fig.set_figwidth(16)
 fig.suptitle("LT Spread, RIMR and curipples")
 
 
-ax1 = plt.subplot2grid((3, 13), (0, 0), colspan=3)
-ax2 = plt.subplot2grid((3, 13), (0, 5), colspan=3)
-ax3 = plt.subplot2grid((3, 13), (0,10), colspan=3)
-ax4 = plt.subplot2grid((3, 13), (1,0), colspan=3)
-ax5 = plt.subplot2grid((3, 13), (1,5), colspan=3)
-ax6 = plt.subplot2grid((3, 13), (1,10), colspan=3)
-ax7 = plt.subplot2grid((3, 13), (2,5), colspan=3)
+ax1 = plt.subplot2grid((4, 15), (0, 1), colspan=6)
+ax2 = plt.subplot2grid((4, 15), (0, 8), colspan=6)
+ax3 = plt.subplot2grid((4, 15), (1,1), colspan=6)
+ax4 = plt.subplot2grid((4, 15), (1,8), colspan=6)
+ax5 = plt.subplot2grid((4, 15), (2,1), colspan=6)
+ax6 = plt.subplot2grid((4, 15), (2,8), colspan=6)
+ax7 = plt.subplot2grid((4, 15), (3,4), colspan=7)
+
+# Add vertical space between the figures
+plt.subplots_adjust(hspace=0.5)
 
 
 ax1.set_xlabel("K")
@@ -301,18 +308,18 @@ fig.savefig("lt_spread_vs_K.png")
 
 
 fig = plt.figure()
-fig.set_figheight(15)
-fig.set_figwidth(20)
+fig.set_figheight(16)
+fig.set_figwidth(16)
 fig.suptitle("SpeedUp, RIMR and curipples, Streams = 10")
 
 
-ax1 = plt.subplot2grid((3, 13), (0, 0), colspan=3)
-ax2 = plt.subplot2grid((3, 13), (0, 5), colspan=3)
-ax3 = plt.subplot2grid((3, 13), (0,10), colspan=3)
-ax4 = plt.subplot2grid((3, 13), (1,0), colspan=3)
-ax5 = plt.subplot2grid((3, 13), (1,5), colspan=3)
-ax6 = plt.subplot2grid((3, 13), (1,10), colspan=3)
-ax7 = plt.subplot2grid((3, 13), (2,5), colspan=3)
+ax1 = plt.subplot2grid((4, 15), (0, 1), colspan=6)
+ax2 = plt.subplot2grid((4, 15), (0, 8), colspan=6)
+ax3 = plt.subplot2grid((4, 15), (1,1), colspan=6)
+ax4 = plt.subplot2grid((4, 15), (1,8), colspan=6)
+ax5 = plt.subplot2grid((4, 15), (2,1), colspan=6)
+ax6 = plt.subplot2grid((4, 15), (2,8), colspan=6)
+ax7 = plt.subplot2grid((4, 15), (3,4), colspan=7)
 
 ax1.set_xlabel("K")
 ax1.set_ylabel("Speedup")
