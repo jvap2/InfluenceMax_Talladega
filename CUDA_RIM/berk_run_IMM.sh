@@ -34,21 +34,21 @@ else
     echo "invalid option"
 fi
 
-make clean
-make IMM
-./bin/IMM BRK $name $dname
+# make clean
+# make IMM
+# ./bin/IMM BRK $name $dname
 cd ../ripples
-conan create conan/trng
-conan create conan/nvidia-cub
-conan install . --build missing -o gpu=nvidia
-conan build . -o gpu=nvidia
+# conan create conan/trng
+# conan create conan/nvidia-cub
+# conan install . --build missing -o gpu=nvidia
+# conan build . -o gpu=nvidia
 cd build/Release/tools
-./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/berk.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 16 -o imm_berk_IC.json
-./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/berk.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_berk_LT.json
-python3 collectdata_ic.py $data_set $vers
-python3 collectdata_lt.py $data_set $vers
-cd ../../../../CUDA_RIM/src
-python3 convertberk.py 
-python3 berk_graph.py $vers $seed_size $dname
-cd ../../RIM_res
-python3 test_communities.py $data_set $vers
+./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/berk.tsv -p --seed-set-size $seed_size --diffusion-model IC --epsilon $ep --streaming-gpu-workers 8 -o imm_berk_IC.json
+# ./imm -i /home/jvap2/Desktop/Code/Infl_Max/Graph_Data_Storage/berk.tsv -p --seed-set-size $seed_size --diffusion-model LT --epsilon $ep --streaming-gpu-workers 16 -o imm_berk_LT.json
+# python3 collectdata_ic.py $data_set $vers
+# python3 collectdata_lt.py $data_set $vers
+# cd ../../../../CUDA_RIM/src
+# python3 convertberk.py 
+# python3 berk_graph.py $vers $seed_size $dname
+# cd ../../RIM_res
+# python3 test_communities.py $data_set $vers

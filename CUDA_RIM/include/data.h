@@ -39,7 +39,7 @@
 #include "GPUErrors.h"
 
 #define TPB 256
-#define K 50
+#define K 300
 
 #define NUMSTRM 10
 
