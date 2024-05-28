@@ -160,7 +160,7 @@ wiki_talk_lt_dist = wiki_talk_df.loc[:,"lt_dist"].to_numpy()
 
 
 fig = plt.figure()
-fig.set_figheight(6)
+fig.set_figheight(5)
 fig.set_figwidth(18)
 fig.suptitle("IC Spread, RIMR and curipples")
 
@@ -239,7 +239,7 @@ ax7.legend()
 fig.savefig("ic_spread_vs_K.png")
 
 fig = plt.figure()
-fig.set_figheight(6)
+fig.set_figheight(5)
 fig.set_figwidth(18)
 fig.suptitle("LT Spread, RIMR and curipples")
 
